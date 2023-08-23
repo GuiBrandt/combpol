@@ -36,6 +36,18 @@ template <typename F> class vecn {
     }
 
     /**
+     * @brief Constrói um vetor constante de tamanho `size`.
+     *
+     * @param size Tamanho do vetor.
+     * @param value Valor copiado em cada coordenada do vetor.
+     */
+    vecn(size_t size, scalar_type value) {
+        m_size = size;
+        m_coords = new scalar_type[size];
+        std::fill(m_coords, m_coords + size, value);
+    }
+
+    /**
      * @brief Move um vetor para um novo vetor.
      *
      * @param other Vetor a ser movido.

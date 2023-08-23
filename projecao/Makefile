@@ -1,7 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -march=native
-
-.PHONY: clean build build-release build-debug run run-debug
+CXXFLAGS=-Wall -m64 -march=native
 
 SOURCES=main.cpp
 HEADERS=linalg/*.hpp
@@ -14,15 +12,25 @@ build/release/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/release
 	$(CXX) -O3 -DNOEXCEPT $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 
-build-debug: build/debug/combpol-projecao
-build-release: build/release/combpol-projecao
+.PHONY: build build-release build-debug
 build: build-release
+build-release: build/release/combpol-projecao
+build-debug: build/debug/combpol-projecao
 
+.PHONY: run run-debug
 run: build
 	@build/release/combpol-projecao
 
 run-debug: build-debug
 	@build/debug/combpol-projecao
 
+.PHONY: clean
 clean:
 	@rm -rf build
+
+.PHONY: memcheck-debug memcheck-release
+memcheck-debug: build-debug
+	@valgrind build/debug/combpol-projecao
+
+memcheck-release: build-release
+	@valgrind build/release/combpol-projecao
