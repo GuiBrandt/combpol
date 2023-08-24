@@ -153,8 +153,8 @@ template <typename F> class polyhedron {
                 size_t t = P[k];
                 scalar_type np = m_A[s].to_vec() * direction,
                             pp = m_A[t].to_vec() * direction;
-                D[i] = m_A[t].to_vec() * np - m_A[s].to_vec() * pp;
-                d[i] = m_b[t] * np - m_b[s] * pp;
+                D[i] = m_A[s].to_vec() * pp - m_A[t].to_vec() * np;
+                d[i] = m_b[s] * pp - m_b[t] * np;
             }
         }
 

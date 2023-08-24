@@ -51,9 +51,6 @@ template <typename F> class vecn {
     }
 
     vecn& operator=(vecn&& other) {
-        internal::validate("cannot assign vectors of different sizes",
-                           [&]() { return other.size() == size(); });
-
         std::swap(m_coords, other.m_coords);
         return *this;
     }

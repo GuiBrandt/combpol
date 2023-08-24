@@ -166,7 +166,7 @@ template <typename F> class matnxm {
         vecn<scalar_type> vec() const {
             vecn<scalar_type> col(size());
             for (size_t i = 0; i < size(); i++) {
-                col[i] = m_matrix(m_col, i);
+                col[i] = m_matrix(i, m_col);
             }
             return col;
         }
@@ -282,6 +282,11 @@ template <typename F> class matnxm {
         return *this;
     }
 
+    matnxm& operator=(matnxm&& other) {
+        std::swap(m_cells, other.m_cells);
+        return *this;
+    }
+
     /**
      * @brief Constrói uma matriz zero com `rows` linhas e `cols` colunas.
      *
@@ -292,15 +297,6 @@ template <typename F> class matnxm {
         m_rows = rows;
         m_cols = cols;
         m_cells = new scalar_type[rows * cols]();
-    }
-
-    matnxm& operator=(matnxm&& other) {
-        internal::validate("cannot assign matrices of different sizes", [&]() {
-            return rows() == other.rows() && cols() == other.cols();
-        });
-
-        std::swap(m_cells, other.m_cells);
-        return *this;
     }
 
     /**
@@ -327,7 +323,7 @@ template <typename F> class matnxm {
      */
     reference operator()(size_t row, size_t col) {
         internal::validate("matrix cell out of bounds",
-                           [&]() { return row <= m_rows && col <= m_cols; });
+                           [&]() { return row < m_rows && col < m_cols; });
 
         return m_cells[col + row * m_cols];
     }
@@ -342,7 +338,7 @@ template <typename F> class matnxm {
      */
     scalar_type operator()(size_t row, size_t col) const {
         internal::validate("matrix cell out of bounds",
-                           [&]() { return row <= m_rows && col <= m_cols; });
+                           [&]() { return row < m_rows && col < m_cols; });
 
         return m_cells[col + row * m_cols];
     }

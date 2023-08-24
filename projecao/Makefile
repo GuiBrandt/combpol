@@ -6,7 +6,7 @@ HEADERS=include/**/*.hpp
 
 build/debug/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/debug
-	$(CXX) -Og -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
+	$(CXX) -g -Og -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 	
 build/release/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/release
