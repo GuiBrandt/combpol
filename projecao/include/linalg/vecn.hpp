@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "internal.hpp"
+#include <internal.hpp>
 
 namespace linalg {
 /**
@@ -24,6 +24,48 @@ template <typename F> class vecn {
     vecn() = delete;
 
     ~vecn() { delete[] m_coords; }
+
+    vecn(vecn&& other) {
+        m_size = other.m_size;
+        std::swap(m_coords, other.m_coords);
+    }
+
+    vecn(const vecn& other) {
+        m_size = other.size();
+        m_coords = new scalar_type[m_size];
+        std::copy(other.m_coords, other.m_coords + m_size, m_coords);
+    }
+
+    vecn(std::initializer_list<F>&& coords) {
+        m_size = coords.size();
+        m_coords = new scalar_type[m_size];
+        std::move(coords.begin(), coords.end(), m_coords);
+    }
+
+    vecn& operator=(const vecn& other) {
+        internal::validate("cannot assign vectors of different sizes",
+                           [&]() { return other.size() == size(); });
+
+        std::copy(other.m_coords, other.m_coords + other.size(), m_coords);
+        return *this;
+    }
+
+    vecn& operator=(vecn&& other) {
+        internal::validate("cannot assign vectors of different sizes",
+                           [&]() { return other.size() == size(); });
+
+        std::swap(m_coords, other.m_coords);
+        return *this;
+    }
+
+    vecn& operator=(std::initializer_list<F>&& coords) {
+        internal::validate(
+            "cannot assign initializer list to vector of different size",
+            [&]() { return coords.size() == size(); });
+
+        std::move(coords.begin(), coords.end(), m_coords);
+        return *this;
+    }
 
     /**
      * @brief Constrói um vetor zero de tamanho `size`.
@@ -48,84 +90,6 @@ template <typename F> class vecn {
     }
 
     /**
-     * @brief Move um vetor para um novo vetor.
-     *
-     * @param other Vetor a ser movido.
-     */
-    vecn(vecn&& other) {
-        m_size = other.m_size;
-        std::swap(m_coords, other.m_coords);
-    }
-
-    /**
-     * @brief Copia um vetor.
-     *
-     * @param other Vetor a ser copiado.
-     */
-    vecn(const vecn& other) {
-        m_size = other.size();
-        m_coords = new scalar_type[m_size];
-        std::copy(other.m_coords, other.m_coords + m_size, m_coords);
-    }
-
-    /**
-     * @brief Inicializa um vetor com uma lista de valores.
-     *
-     * @param coords Valores das coordenadas do vetor.
-     */
-    vecn(std::initializer_list<F>&& coords) {
-        m_size = coords.size();
-        m_coords = new scalar_type[m_size];
-        std::move(coords.begin(), coords.end(), m_coords);
-    }
-
-    /**
-     * @brief Copia um vetor de mesmo tamanho neste.
-     *
-     * @param other Vetor a ser copiado.
-     *
-     * @return vecn& Uma referência para este vetor.
-     */
-    vecn& operator=(const vecn& other) {
-        internal::validate("cannot assign vectors of different sizes",
-                           [&]() { return other.size() == size(); });
-
-        std::copy(other.m_coords, other.m_coords + other.size(), m_coords);
-        return *this;
-    }
-
-    /**
-     * @brief Move um vetor de mesmo tamanho neste.
-     *
-     * @param other Vetor a ser copiado.
-     *
-     * @return vecn& Uma referência para este vetor.
-     */
-    vecn& operator=(vecn&& other) {
-        internal::validate("cannot assign vectors of different sizes",
-                           [&]() { return other.size() == size(); });
-
-        std::swap(m_coords, other.m_coords);
-        return *this;
-    }
-
-    /**
-     * @brief Move uma lista de valores de tamanho apropriado neste vetor.
-     *
-     * @param coords Lista de valores.
-     *
-     * @return vecn& Uma referência para este vetor.
-     */
-    vecn& operator=(std::initializer_list<F>&& coords) {
-        internal::validate(
-            "cannot assign initializer list to vector of different size",
-            [&]() { return coords.size() == size(); });
-
-        std::move(coords.begin(), coords.end(), m_coords);
-        return *this;
-    }
-
-    /**
      * @brief Tamanho do vetor.
      *
      * @return size_t O tamanho do vetor.
@@ -145,7 +109,36 @@ template <typename F> class vecn {
 
         vecn result(*this);
         for (size_t i = 0; i < m_size; i++) {
-            result[i] = other.m_result[i];
+            result[i] += other[i];
+        }
+        return result;
+    }
+
+    /**
+     * @brief Inverso aditivo do vetor.
+     *
+     * @return vecn O inverso aditivo do vetor original.
+     */
+    vecn operator-() const {
+        vecn result(*this);
+        for (size_t i = 0; i < m_size; i++) {
+            result[i] *= -1;
+        }
+        return result;
+    }
+
+    /**
+     * @brief Inverso aditivo do vetor.
+     *
+     * @return vecn O inverso aditivo do vetor original.
+     */
+    vecn operator-(const vecn& other) const {
+        internal::validate("cannot subtract vectors of different sizes",
+                           [&]() { return other.size() == size(); });
+
+        vecn result(*this);
+        for (size_t i = 0; i < m_size; i++) {
+            result[i] -= other[i];
         }
         return result;
     }
@@ -211,6 +204,21 @@ template <typename F> class vecn {
                            [&]() { return index < size(); });
 
         return m_coords[index];
+    }
+
+    /**
+     * @brief Determina se o vetor é o vetor 0.
+     *
+     * @return true se toda coordenada no vetor é igual a 0.
+     * @return false caso contrário.
+     */
+    bool zero() const {
+        for (size_t i = 0; i < size(); i++) {
+            if (this->operator[](i) != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 };
 }; // namespace linalg

@@ -1,16 +1,16 @@
 CXX=g++
-CXXFLAGS=-Wall -m64 -march=native
+CXXFLAGS=-Wall -march=native
 
 SOURCES=main.cpp
-HEADERS=linalg/*.hpp
+HEADERS=include/**/*.hpp
 
 build/debug/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/debug
-	$(CXX) -Og $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
+	$(CXX) -Og -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 	
 build/release/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/release
-	$(CXX) -O3 -DNOEXCEPT $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
+	$(CXX) -O3 -DNOEXCEPT -DNDEBUG -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 
 .PHONY: build build-release build-debug
 build: build-release

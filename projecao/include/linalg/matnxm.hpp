@@ -2,10 +2,11 @@
 #define __LINALG_MATNXM__
 
 #include <algorithm>
+#include <initializer_list>
 #include <utility>
 
-#include "internal.hpp"
 #include "vecn.hpp"
+#include <internal.hpp>
 
 namespace linalg {
 /**
@@ -16,7 +17,7 @@ struct all_t {};
 /**
  * @brief Objeto auxiliar para seleção de linhas e colunas em matrizes.
  */
-static all_t all = {};
+static constexpr all_t all = {};
 
 /**
  * @brief Classe para matrizes sobre um corpo F.
@@ -104,33 +105,28 @@ template <typename F> class matnxm {
         }
 
         /**
-         * @brief Copia um vetor na linha, sobrescrevendo a matriz original.
-         *
-         * @param vec<F> Vetor a ser copiado.
-         *
-         * @return mrow_t& Referência para esta linha.
-         */
-        row_t& operator=(const vecn<scalar_type>& vec) {
-            internal::validate("cannot assign vector to row of different size",
-                               [&]() { return size() == vec.size(); });
-
-            for (size_t j = 0; j < size(); j++) {
-                this->operator[](j) = vec[j];
-            }
-            return *this;
-        }
-
-        /**
-         * @brief Copia outra linha nesta linha, sobrescrevendo a matriz
-         * original.
+         * @brief Copia um vetor nesta linha, sobrescrevendo a matriz original.
          *
          * @param mrow_t Linha a ser copiada.
          *
          * @return mrow_t& Referência para esta linha.
          */
-        row_t& operator=(const row_t& other) {
-            internal::validate("cannot assign row to row of different size",
-                               [&]() { return size() == other.size(); });
+        row_t& operator=(std::initializer_list<scalar_type>&& coords) {
+            return (*this) = vecn<scalar_type>(std::move(coords));
+        }
+
+        /**
+         * @brief Copia um vetor, linha ou coluna nesta linha, sobrescrevendo a
+         * matriz original.
+         *
+         * @param mrow_t Vetor, linha ou coluna a ser copiado.
+         *
+         * @return mrow_t& Referência para esta linha.
+         */
+        template <typename VecLike> row_t& operator=(const VecLike& other) {
+            internal::validate(
+                "cannot assign vector-like to row of different size",
+                [&]() { return size() == other.size(); });
 
             for (size_t j = 0; j < size(); j++) {
                 this->operator[](j) = other[j];
@@ -217,34 +213,27 @@ template <typename F> class matnxm {
         }
 
         /**
-         * @brief Copia um vetor na coluna, sobrescrevendo a matriz original.
+         * @brief Copia um vetor nesta coluna, sobrescrevendo a matriz original.
          *
          * @param vec<F> Vetor a ser copiado.
          *
          * @return mcol_t& Referência para esta coluna.
          */
-        column_t& operator=(const vecn<scalar_type>& vec) {
-            internal::validate(
-                "cannot assign vector to column of different size",
-                [&]() { return size() == vec.size(); });
-
-            for (size_t i = 0; i < size(); i++) {
-                this->operator[](i) = vec[i];
-            }
-            return *this;
+        column_t& operator=(std::initializer_list<scalar_type>&& coords) {
+            return (*this) = vecn<scalar_type>(std::move(coords));
         }
 
         /**
-         * @brief Copia outra coluna nesta coluna, sobrescrevendo a matriz
-         * original.
+         * @brief Copia um vetor, linha ou coluna nesta coluna, sobrescrevendo a
+         * matriz original.
          *
-         * @param mcol_t Coluna a ser copiada.
+         * @param mcol_t Vetor, linha ou coluna a ser copiada.
          *
          * @return mcol_t& Referência para esta coluna.
          */
-        column_t& operator=(const column_t& other) {
+        template <typename VecLike> column_t& operator=(const VecLike& other) {
             internal::validate(
-                "cannot assign column to column of different size",
+                "cannot assign vector-like to column of different size",
                 [&]() { return size() == other.size(); });
 
             for (size_t i = 0; i < size(); i++) {
@@ -271,6 +260,28 @@ template <typename F> class matnxm {
 
     ~matnxm() { delete[] m_cells; }
 
+    matnxm(matnxm&& other) {
+        m_rows = other.m_rows;
+        m_cols = other.m_cols;
+        std::swap(other.m_cells, m_cells);
+    }
+
+    matnxm(const matnxm& other) {
+        m_rows = other.rows();
+        m_cols = other.cols();
+        m_cells = new scalar_type[other.rows() * other.cols()];
+        std::copy(other.m_cells, other.m_cells + m_rows * m_cols, m_cells);
+    }
+
+    matnxm& operator=(const matnxm& other) {
+        internal::validate("cannot assign matrices of different sizes", [&]() {
+            return rows() == other.rows() && cols() == other.cols();
+        });
+
+        std::copy(other.m_cells, other.m_cells + other.size(), m_cells);
+        return *this;
+    }
+
     /**
      * @brief Constrói uma matriz zero com `rows` linhas e `cols` colunas.
      *
@@ -283,27 +294,13 @@ template <typename F> class matnxm {
         m_cells = new scalar_type[rows * cols]();
     }
 
-    /**
-     * @brief Move uma matriz para uma nova matriz.
-     *
-     * @param other Matriz a ser movida.
-     */
-    matnxm(matnxm&& other) {
-        m_rows = other.m_rows;
-        m_cols = other.m_cols;
-        std::swap(other.m_cells, m_cells);
-    }
+    matnxm& operator=(matnxm&& other) {
+        internal::validate("cannot assign matrices of different sizes", [&]() {
+            return rows() == other.rows() && cols() == other.cols();
+        });
 
-    /**
-     * @brief Copia uma matriz.
-     *
-     * @param other Matriz a ser copiada.
-     */
-    matnxm(const matnxm& other) {
-        m_rows = other.rows();
-        m_cols = other.cols();
-        m_cells = new scalar_type[other.rows() * other.cols()];
-        std::copy(other.m_cells, other.m_cells + m_rows * m_cols, m_cells);
+        std::swap(m_cells, other.m_cells);
+        return *this;
     }
 
     /**
@@ -513,6 +510,23 @@ template <typename F> class matnxm {
             }
         }
         return result;
+    }
+
+    /**
+     * @brief Determina se a matriz é a matriz 0.
+     *
+     * @return true se toda célula na matriz é igual a 0.
+     * @return false caso contrário.
+     */
+    bool zero() const {
+        for (size_t i = 0; i < rows(); i++) {
+            for (size_t j = 0; j < cols(); j++) {
+                if (this->operator()(i, j) != 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
