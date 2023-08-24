@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <type_traits>
 #include <utility>
 
 #include "vecn.hpp"
@@ -33,6 +34,7 @@ template <typename F> class matnxm {
   public:
     using scalar_type = F;
     using reference = scalar_type&;
+    using const_reference = const scalar_type&;
 
     /**
      * @brief Classe auxiliar para manipulação de linhas em uma matriz.
@@ -46,6 +48,11 @@ template <typename F> class matnxm {
         friend class matnxm;
 
       public:
+        using reference = std::conditional_t<
+            std::is_const<std::remove_reference_t<MRef>>::value,
+            matnxm::const_reference,
+            matnxm::reference>;
+
         row_t() = delete;
         row_t(const row_t&) = default;
         row_t(row_t&&) = default;
@@ -89,20 +96,20 @@ template <typename F> class matnxm {
          *
          * @param col Coluna a ser acessada.
          *
-         * @return F& Referência para a célula correspondente na matriz.
+         * @return F Valor da célula correspondente na matriz.
          */
-        reference operator[](size_t col) { return m_matrix(m_row, col); }
-
+        const_reference operator[](size_t col) const {
+            return m_matrix(m_row, col);
+        }
+        
         /**
          * @brief Acessa uma coluna da linha.
          *
          * @param col Coluna a ser acessada.
          *
-         * @return F Valor da célula correspondente na matriz.
+         * @return F& Referência para a célula correspondente na matriz.
          */
-        scalar_type operator[](size_t col) const {
-            return m_matrix(m_row, col);
-        }
+        reference operator[](size_t col) { return m_matrix(m_row, col); }
 
         /**
          * @brief Copia um vetor nesta linha, sobrescrevendo a matriz original.
@@ -154,6 +161,11 @@ template <typename F> class matnxm {
         friend class matnxm;
 
       public:
+        using reference = std::conditional_t<
+            std::is_const<std::remove_reference_t<MRef>>::value,
+            matnxm::const_reference,
+            matnxm::reference>;
+            
         column_t() = delete;
         column_t(const column_t&) = default;
         column_t(column_t&&) = default;
@@ -197,20 +209,20 @@ template <typename F> class matnxm {
          *
          * @param row Linha a ser acessada.
          *
-         * @return F& Referência para a célula correspondente na matriz.
+         * @return F Valor da célula correspondente na matriz.
          */
-        reference operator[](size_t row) { return m_matrix(row, m_col); }
+        const_reference operator[](size_t row) const {
+            return m_matrix(row, m_col);
+        }
 
         /**
          * @brief Acessa uma linha da coluna.
          *
          * @param row Linha a ser acessada.
          *
-         * @return F Valor da célula correspondente na matriz.
+         * @return F& Referência para a célula correspondente na matriz.
          */
-        scalar_type operator[](size_t row) const {
-            return m_matrix(row, m_col);
-        }
+        reference operator[](size_t row) { return m_matrix(row, m_col); }
 
         /**
          * @brief Copia um vetor nesta coluna, sobrescrevendo a matriz original.
@@ -256,14 +268,14 @@ template <typename F> class matnxm {
     using row_type = row_t<matnxm&>;
     using const_row_type = row_t<const matnxm&>;
 
-    matnxm() = delete;
+    matnxm() : m_cells(nullptr), m_rows(0), m_cols(0) {}
 
     ~matnxm() { delete[] m_cells; }
 
     matnxm(matnxm&& other) {
+        std::swap(other.m_cells, m_cells);
         m_rows = other.m_rows;
         m_cols = other.m_cols;
-        std::swap(other.m_cells, m_cells);
     }
 
     matnxm(const matnxm& other) {
@@ -278,12 +290,14 @@ template <typename F> class matnxm {
             return rows() == other.rows() && cols() == other.cols();
         });
 
-        std::copy(other.m_cells, other.m_cells + other.size(), m_cells);
+        std::copy(other.m_cells, other.m_cells + other.rows() * other.cols(), m_cells);
         return *this;
     }
 
     matnxm& operator=(matnxm&& other) {
         std::swap(m_cells, other.m_cells);
+        m_rows = other.m_rows;
+        m_cols = other.m_cols;
         return *this;
     }
 
@@ -336,7 +350,7 @@ template <typename F> class matnxm {
      *
      * @return F Valor da célula na matriz.
      */
-    scalar_type operator()(size_t row, size_t col) const {
+    const_reference operator()(size_t row, size_t col) const {
         internal::validate("matrix cell out of bounds",
                            [&]() { return row < m_rows && col < m_cols; });
 

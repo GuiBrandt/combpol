@@ -21,7 +21,7 @@ template <typename F> class vecn {
     using scalar_type = F;
     using reference = scalar_type&;
 
-    vecn() = delete;
+    vecn() : m_size(0), m_coords(nullptr) {}
 
     ~vecn() { delete[] m_coords; }
 
@@ -52,15 +52,13 @@ template <typename F> class vecn {
 
     vecn& operator=(vecn&& other) {
         std::swap(m_coords, other.m_coords);
+        m_size = other.m_size;
         return *this;
     }
 
     vecn& operator=(std::initializer_list<F>&& coords) {
-        internal::validate(
-            "cannot assign initializer list to vector of different size",
-            [&]() { return coords.size() == size(); });
-
         std::move(coords.begin(), coords.end(), m_coords);
+        m_size = coords.size();
         return *this;
     }
 

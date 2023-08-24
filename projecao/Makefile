@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -march=native
+CXXFLAGS=-std=c++14 -Wall -Wno-format-security -march=native
 
 SOURCES_DIR=src
 HEADERS_DIR=$(SOURCES_DIR)/include

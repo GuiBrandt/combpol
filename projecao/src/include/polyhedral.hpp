@@ -23,24 +23,11 @@ template <typename F> class polyhedron {
   public:
     using scalar_type = F;
 
-    polyhedron() = delete;
-
-    polyhedron(const polyhedron& other) : m_A(other.A()), m_b(other.b()) {}
-
-    polyhedron(polyhedron&& other)
-        : m_A(std::move(other.A())), m_b(std::move(other.b())) {}
-
-    polyhedron& operator=(const polyhedron& other) {
-        m_A = other.A();
-        m_b = other.b();
-        return *this;
-    }
-
-    polyhedron& operator=(polyhedron&& other) {
-        m_A = std::move(other.A());
-        m_b = std::move(other.b());
-        return *this;
-    }
+    polyhedron() = default;
+    polyhedron(const polyhedron& other) = default;
+    polyhedron(polyhedron&& other) = default;
+    polyhedron& operator=(const polyhedron& other) = default;
+    polyhedron& operator=(polyhedron&& other) = default;
 
     /**
      * @brief Constrói um poliedro P(A, b) copiando uma matriz A e um vetor b
@@ -151,6 +138,8 @@ template <typename F> class polyhedron {
             size_t s = N[j];
             for (size_t k = 0; k < P.size(); k++, i++) {
                 size_t t = P[k];
+                
+                // "*" é o produto interno de vetores.
                 scalar_type np = m_A[s].to_vec() * direction,
                             pp = m_A[t].to_vec() * direction;
                 D[i] = m_A[s].to_vec() * pp - m_A[t].to_vec() * np;
