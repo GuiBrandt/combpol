@@ -1,36 +1,43 @@
 CXX=g++
 CXXFLAGS=-Wall -march=native
 
-SOURCES=main.cpp
-HEADERS=include/**/*.hpp
+SOURCES_DIR=src
+HEADERS_DIR=$(SOURCES_DIR)/include
+BUILD_DIR=build
 
-build/debug/combpol-projecao: $(SOURCES) $(HEADERS)
+SOURCES=$(SOURCES_DIR)/main.cpp
+HEADERS=$(HEADERS_DIR)/**/*.hpp
+
+.PHONY: all
+all: build
+
+$(BUILD_DIR)/debug/combpol-projecao: $(SOURCES) $(HEADERS)
 	@mkdir -p build/debug
-	$(CXX) -g -Og -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
+	$(CXX) -g -Og -I$(HEADERS_DIR) $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 	
-build/release/combpol-projecao: $(SOURCES) $(HEADERS)
-	@mkdir -p build/release
-	$(CXX) -O3 -DNOEXCEPT -DNDEBUG -Iinclude $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
+$(BUILD_DIR)/release/combpol-projecao: $(SOURCES) $(HEADERS)
+	@mkdir -p $(BUILD_DIR)/release
+	$(CXX) -O3 -DNOEXCEPT -DNDEBUG -I$(HEADERS_DIR) $(CXXFLAGS) $(SOURCES) $(LDFLAGS) -o $@
 
 .PHONY: build build-release build-debug
 build: build-release
-build-release: build/release/combpol-projecao
-build-debug: build/debug/combpol-projecao
+build-release: $(BUILD_DIR)/release/combpol-projecao
+build-debug: $(BUILD_DIR)/debug/combpol-projecao
 
 .PHONY: run run-debug
 run: build
-	@build/release/combpol-projecao
+	@$(BUILD_DIR)/release/combpol-projecao
 
 run-debug: build-debug
-	@build/debug/combpol-projecao
+	@$(BUILD_DIR)/debug/combpol-projecao
 
 .PHONY: clean
 clean:
-	@rm -rf build
+	@rm -rf $(BUILD_DIR)
 
 .PHONY: memcheck-debug memcheck-release
 memcheck-debug: build-debug
-	@valgrind build/debug/combpol-projecao
+	@valgrind $(BUILD_DIR)/debug/combpol-projecao
 
 memcheck-release: build-release
-	@valgrind build/release/combpol-projecao
+	@valgrind $(BUILD_DIR)/release/combpol-projecao

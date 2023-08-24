@@ -1,2 +1,2 @@
 -Wall
--Iinclude
+-Isrc/include
