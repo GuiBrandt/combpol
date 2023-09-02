@@ -5,11 +5,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
+#include <initializer_list>
 #include <iterator>
 #include <limits>
 #include <string>
 #include <type_traits>
 #include <vector>
+
+#include <linalg/vecn.hpp>
 
 namespace cli {
 namespace parser {
@@ -126,7 +129,8 @@ template <typename F> struct integral_scalar_parser {
         output = F(std::strtoll(value_start_p, &value_end_p, 10));
 
         // Ignora espaços em branco e retorna a última posição lida.
-        return skip_blank(begin + (value_end_p - value_start_p), end);
+        return std::min(end,
+                        skip_blank(begin + (value_end_p - value_start_p), end));
     }
 };
 
@@ -158,7 +162,8 @@ template <typename F> struct floating_point_scalar_parser {
         output = F(std::strtold(value_start_p, &value_end_p));
 
         // Ignora espaços em branco e retorna a última posição lida.
-        return skip_blank(begin + (value_end_p - value_start_p), end);
+        return std::min(end,
+                        skip_blank(begin + (value_end_p - value_start_p), end));
     }
 };
 
@@ -215,10 +220,12 @@ template <typename F> class parser {
   public:
     parser() = delete;
 
-    parser(const char* filename, size_t line)
-        : m_filename(filename), m_line(line), m_scalar_parser() {}
+    parser(const char* filename, size_t line, parse_pos begin, parse_pos end)
+        : m_filename(filename), m_line(line), m_begin(begin), m_end(end),
+          m_scalar_parser() {}
 
-    parser(const char* filename) : parser(filename, 1) {}
+    parser(const char* filename, parse_pos begin, parse_pos end)
+        : parser(filename, 1, begin, end) {}
 
     /**
      * @brief Lê um escalar de uma string dada.
@@ -231,11 +238,15 @@ template <typename F> class parser {
      * @return parse_pos Posição onde a leitura terminou.
      */
     parse_pos parse_scalar(parse_pos begin, parse_pos end, F& output) const {
+        if (begin == end) {
+            fail(begin, "expected scalar");
+        }
+
         // Delega o trabalho para o parser de valores escalares.
         auto value_end = m_scalar_parser.parse_scalar(begin, end, output);
 
         // Garante que a string foi lida até o fim.
-        if (value_end < end) {
+        if (value_end != end) {
             fail(value_end, "expected scalar continuation, found '%c'",
                  *value_end);
         }
@@ -261,8 +272,9 @@ template <typename F> class parser {
         output = std::strtoull(value_start_p, &value_end_p, 10);
 
         // Ignora espaços em branco e garante que a string foi lida até o fim.
-        auto value_end = skip_blank(begin + (value_end_p - value_start_p), end);
-        if (value_end < end) {
+        auto value_end = std::min(
+            end, skip_blank(begin + (value_end_p - value_start_p), end));
+        if (value_end != end) {
             fail(value_end, "expected digit or whitespace, found '%c'",
                  *value_end);
         }
@@ -374,9 +386,6 @@ template <typename F> class parser {
      */
     parse_pos parse_linear_inequality(parse_pos begin, parse_pos end,
                                       linear_inequality<F>& output) const {
-        // Ignora espaços em branco no começo da string.
-        begin = skip_blank(begin, end);
-
         // Toda desigualdade tem um sinal de "<=".
         static const char LE[] = "<=";
 
@@ -403,6 +412,70 @@ template <typename F> class parser {
             fail(inequality_end, "expected <EOL>, found '%c'", *inequality_end);
         }
         return inequality_end;
+    }
+
+    /**
+     * @brief Lê um vetor de uma string dada.
+     *
+     * Gramática:
+     *  <vetor> ::= "(" (<escalar>)+ ")"
+     *
+     * @param begin Iterador para o início da string.
+     * @param end Iterador para o fim da string.
+     * @param output Referência para o resultado da leitura.
+     * @return parse_pos Posição onde a leitura terminou.
+     */
+    parse_pos parse_vector(parse_pos begin, parse_pos end,
+                           linalg::vecn<F>& output) const {
+        // Ignora espaços em branco no início da linha.
+        begin = skip_blank(begin, end);
+
+        // Todo vetor é delimitado por parênteses.
+        auto lparen_index = std::find(begin, end, '(');
+        if (lparen_index == end) {
+            fail(lparen_index, "expected '(', found <EOL>");
+        }
+
+        auto rparen_index = std::find(begin, end, ')');
+        if (lparen_index == end) {
+            fail(lparen_index, "expected ')', found <EOL>");
+        }
+
+        // Um vetor é uma sequência (não-vazia) de escalares. A primeira
+        // coordenada está diretamente à direita do primeiro parêntese.
+        auto coord_begin = skip_blank(lparen_index + 1, end);
+        if (coord_begin == rparen_index) {
+            fail(coord_begin, "vector must not be empty");
+        }
+
+        std::vector<F> coords;
+        do {
+            // O limite de uma coordenada é exatamente o primeiro espaço em
+            // branco após seu começo.
+            auto coord_limit = std::find_if(coord_begin, rparen_index,
+                                            [](char c) { return isspace(c); });
+
+            // Lê a próxima coordenada e avança a leitura para a seguinte,
+            // ignorando espaços em branco.
+            F scalar;
+            auto coord_end = parse_scalar(coord_begin, coord_limit, scalar);
+            coords.push_back(scalar);
+
+            coord_begin = skip_blank(coord_end, rparen_index);
+        } while (coord_begin != rparen_index);
+
+        // Ignora espaços em branco e garante que a string foi lida até o fim.
+        auto vector_end = skip_blank(rparen_index + 1, end);
+        if (vector_end != end) {
+            fail(vector_end, "unexpected character '%c'", *vector_end);
+        }
+
+        output = linalg::vecn<F>(coords.size());
+        for (size_t i = 0; i < coords.size(); i++) {
+            output[i] = coords[i];
+        }
+
+        return vector_end;
     }
 };
 

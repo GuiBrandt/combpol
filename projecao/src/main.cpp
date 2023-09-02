@@ -11,18 +11,8 @@ using namespace polyhedral;
 using namespace cli;
 
 int main(int argc, char** argv) {
-    // matnxm<int> A(7, 2);
-    // A[0] = {1, 2};
-    // A[1] = {3, 2};
-    // A[2] = {5, 1};
-    // A[3] = {0, 1};
-    // A[4] = {-3, -1};
-    // A[5] = {-1, 0};
-    // A[6] = {0, -1};
-
-    // vecn<int> b = {5, 10, 15, 2, -2, 0, 0};
-
     polyhedron<int> P;
+    vecn<int> c;
 
     while (1) {
         try {
@@ -35,6 +25,14 @@ int main(int argc, char** argv) {
                       << std::endl;
             std::cout << P << std::endl;
             std::cout << "P empty? " << (P.empty() ? "yes" : "no") << std::endl;
+            
+            std::cin >> c;
+            std::cout << std::endl << "(c) 1 x " << c.size() << std::endl;
+            std::cout << c << std::endl << std::endl;
+            
+            polyhedron<int> P_H = P.project(c);
+            std::cout << "(P_H)" << std::endl;
+            std::cout << P.project(c) << std::endl;            
         } catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
         }
