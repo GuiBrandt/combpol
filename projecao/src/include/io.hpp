@@ -5,11 +5,12 @@
 #include <string>
 #include <utility>
 
-#include <cli/parser.hpp>
 #include <linalg.hpp>
 #include <polyhedral.hpp>
 
-namespace cli {
+#include <io/parser.hpp>
+
+namespace io {
 using namespace linalg;
 using namespace polyhedral;
 
@@ -51,8 +52,13 @@ std::ostream&& operator<<(std::ostream&& os, const vecn<F>& vec) {
 template <typename F> std::istream& operator>>(std::istream& is, vecn<F>& vec) {
     std::string line;
     if (std::getline(is, line)) {
+        std::vector<F> coords;
         parser::parser<F>("<stdin>", line.begin(), line.end())
-            .parse_vector(line.begin(), line.end(), vec);
+            .parse_vector(line.begin(), line.end(), coords);
+        vec = vecn<F>(coords.size());
+        for (size_t i = 0; i < coords.size(); i++) {
+            vec[i] = coords[i];
+        }
     } else {
         throw std::ios_base::failure(
             "could not read vector from input stream: reached EOS");
@@ -159,6 +165,6 @@ std::istream&& operator>>(std::istream&& is, polyhedron<F>& P) {
     return std::move(is >> P);
 }
 
-}; // namespace cli
+}; // namespace io
 
 #endif // __CLI_HPP__

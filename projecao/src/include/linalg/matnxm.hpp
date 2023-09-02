@@ -3,11 +3,13 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
-#include "vecn.hpp"
 #include <internal.hpp>
+
+#include "vecn.hpp"
 
 namespace linalg {
 /**
@@ -27,7 +29,7 @@ static constexpr all_t all = {};
  */
 template <typename F> class matnxm {
   private:
-    F* m_cells;
+    std::unique_ptr<F[]> m_cells;
     size_t m_rows;
     size_t m_cols;
 
@@ -50,8 +52,7 @@ template <typename F> class matnxm {
       public:
         using reference = std::conditional_t<
             std::is_const<std::remove_reference_t<MRef>>::value,
-            matnxm::const_reference,
-            matnxm::reference>;
+            matnxm::const_reference, matnxm::reference>;
 
         row_t() = delete;
         row_t(const row_t&) = default;
@@ -101,7 +102,7 @@ template <typename F> class matnxm {
         const_reference operator[](size_t col) const {
             return m_matrix(m_row, col);
         }
-        
+
         /**
          * @brief Acessa uma coluna da linha.
          *
@@ -163,9 +164,8 @@ template <typename F> class matnxm {
       public:
         using reference = std::conditional_t<
             std::is_const<std::remove_reference_t<MRef>>::value,
-            matnxm::const_reference,
-            matnxm::reference>;
-            
+            matnxm::const_reference, matnxm::reference>;
+
         column_t() = delete;
         column_t(const column_t&) = default;
         column_t(column_t&&) = default;
@@ -268,36 +268,21 @@ template <typename F> class matnxm {
     using row_type = row_t<matnxm&>;
     using const_row_type = row_t<const matnxm&>;
 
-    matnxm() : m_cells(nullptr), m_rows(0), m_cols(0) {}
+    matnxm() = default;
 
-    ~matnxm() { delete[] m_cells; }
+    matnxm(matnxm&& other) = default;
+    matnxm& operator=(matnxm&& other) = default;
 
-    matnxm(matnxm&& other) {
-        std::swap(other.m_cells, m_cells);
-        m_rows = other.m_rows;
-        m_cols = other.m_cols;
-    }
-
-    matnxm(const matnxm& other) {
-        m_rows = other.rows();
-        m_cols = other.cols();
-        m_cells = new scalar_type[other.rows() * other.cols()];
-        std::copy(other.m_cells, other.m_cells + m_rows * m_cols, m_cells);
-    }
+    matnxm(const matnxm& other) { *this = other; }
 
     matnxm& operator=(const matnxm& other) {
-        internal::validate("cannot assign matrices of different sizes", [&]() {
-            return rows() == other.rows() && cols() == other.cols();
-        });
-
-        std::copy(other.m_cells, other.m_cells + other.rows() * other.cols(), m_cells);
-        return *this;
-    }
-
-    matnxm& operator=(matnxm&& other) {
-        std::swap(m_cells, other.m_cells);
         m_rows = other.m_rows;
         m_cols = other.m_cols;
+
+        auto size = m_rows * m_cols;
+        m_cells = std::make_unique<F[]>(size);
+        std::copy(other.m_cells.get(), other.m_cells.get() + size,
+                  m_cells.get());
         return *this;
     }
 
@@ -310,7 +295,7 @@ template <typename F> class matnxm {
     matnxm(size_t rows, size_t cols) {
         m_rows = rows;
         m_cols = cols;
-        m_cells = new scalar_type[rows * cols]();
+        m_cells = std::make_unique<F[]>(rows * cols);
     }
 
     /**

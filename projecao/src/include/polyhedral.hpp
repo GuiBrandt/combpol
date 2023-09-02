@@ -1,10 +1,10 @@
 #ifndef __POLYHEDRAL__
 #define __POLYHEDRAL__
 
-#include "internal.hpp"
 #include <cassert>
 #include <vector>
 
+#include <internal.hpp>
 #include <linalg.hpp>
 
 namespace polyhedral {
@@ -24,10 +24,12 @@ template <typename F> class polyhedron {
     using scalar_type = F;
 
     polyhedron() = default;
-    polyhedron(const polyhedron& other) = default;
+
     polyhedron(polyhedron&& other) = default;
-    polyhedron& operator=(const polyhedron& other) = default;
     polyhedron& operator=(polyhedron&& other) = default;
+
+    polyhedron(const polyhedron& other) = default;
+    polyhedron& operator=(const polyhedron& other) = default;
 
     /**
      * @brief Constrói um poliedro P(A, b) copiando uma matriz A e um vetor b
@@ -138,7 +140,7 @@ template <typename F> class polyhedron {
             size_t s = N[j];
             for (size_t k = 0; k < P.size(); k++, i++) {
                 size_t t = P[k];
-                
+
                 // "*" é o produto interno de vetores.
                 scalar_type np = m_A[s].to_vec() * direction,
                             pp = m_A[t].to_vec() * direction;

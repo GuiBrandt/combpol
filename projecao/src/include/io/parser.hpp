@@ -12,9 +12,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <linalg/vecn.hpp>
-
-namespace cli {
+namespace io {
 namespace parser {
 
 using parse_pos = std::string::const_iterator;
@@ -426,7 +424,7 @@ template <typename F> class parser {
      * @return parse_pos Posição onde a leitura terminou.
      */
     parse_pos parse_vector(parse_pos begin, parse_pos end,
-                           linalg::vecn<F>& output) const {
+                           std::vector<F>& output) const {
         // Ignora espaços em branco no início da linha.
         begin = skip_blank(begin, end);
 
@@ -448,7 +446,7 @@ template <typename F> class parser {
             fail(coord_begin, "vector must not be empty");
         }
 
-        std::vector<F> coords;
+        output.clear();
         do {
             // O limite de uma coordenada é exatamente o primeiro espaço em
             // branco após seu começo.
@@ -459,7 +457,7 @@ template <typename F> class parser {
             // ignorando espaços em branco.
             F scalar;
             auto coord_end = parse_scalar(coord_begin, coord_limit, scalar);
-            coords.push_back(scalar);
+            output.push_back(scalar);
 
             coord_begin = skip_blank(coord_end, rparen_index);
         } while (coord_begin != rparen_index);
@@ -470,16 +468,11 @@ template <typename F> class parser {
             fail(vector_end, "unexpected character '%c'", *vector_end);
         }
 
-        output = linalg::vecn<F>(coords.size());
-        for (size_t i = 0; i < coords.size(); i++) {
-            output[i] = coords[i];
-        }
-
         return vector_end;
     }
 };
 
 }; // namespace parser
-}; // namespace cli
+}; // namespace io
 
 #endif // __PARSER_HPP__

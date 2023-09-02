@@ -2,6 +2,7 @@
 #define __LINALG_VECN__
 
 #include <algorithm>
+#include <memory>
 #include <utility>
 
 #include <internal.hpp>
@@ -15,49 +16,35 @@ namespace linalg {
 template <typename F> class vecn {
   private:
     size_t m_size;
-    F* m_coords;
+    std::unique_ptr<F[]> m_coords;
 
   public:
     using scalar_type = F;
     using reference = scalar_type&;
 
-    vecn() : m_size(0), m_coords(nullptr) {}
+    vecn() = default;
 
-    ~vecn() { delete[] m_coords; }
+    vecn(vecn&& other) = default;
+    vecn& operator=(vecn&& other) = default;
 
-    vecn(vecn&& other) {
+    vecn(const vecn& other) { *this = other; }
+
+    vecn& operator=(const vecn& other) {
         m_size = other.m_size;
-        std::swap(m_coords, other.m_coords);
-    }
-
-    vecn(const vecn& other) {
-        m_size = other.size();
-        m_coords = new scalar_type[m_size];
-        std::copy(other.m_coords, other.m_coords + m_size, m_coords);
+        m_coords = std::make_unique<F[]>(m_size);
+        std::copy(other.m_coords.get(), other.m_coords.get() + m_size,
+                  m_coords.get());
+        return *this;
     }
 
     vecn(std::initializer_list<F>&& coords) {
         m_size = coords.size();
-        m_coords = new scalar_type[m_size];
-        std::move(coords.begin(), coords.end(), m_coords);
-    }
-
-    vecn& operator=(const vecn& other) {
-        internal::validate("cannot assign vectors of different sizes",
-                           [&]() { return other.size() == size(); });
-
-        std::copy(other.m_coords, other.m_coords + other.size(), m_coords);
-        return *this;
-    }
-
-    vecn& operator=(vecn&& other) {
-        std::swap(m_coords, other.m_coords);
-        m_size = other.m_size;
-        return *this;
+        m_coords = std::make_unique<F[]>(m_size);
+        std::move(coords.begin(), coords.end(), m_coords.get());
     }
 
     vecn& operator=(std::initializer_list<F>&& coords) {
-        std::move(coords.begin(), coords.end(), m_coords);
+        std::move(coords.begin(), coords.end(), m_coords.get());
         m_size = coords.size();
         return *this;
     }
@@ -69,7 +56,7 @@ template <typename F> class vecn {
      */
     explicit vecn(size_t size) {
         m_size = size;
-        m_coords = new scalar_type[size]();
+        m_coords = std::make_unique<F[]>(size);
     }
 
     /**

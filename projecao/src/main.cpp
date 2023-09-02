@@ -1,6 +1,5 @@
-#include "cli/parser.hpp"
-#include <cli.hpp>
 #include <exception>
+#include <io.hpp>
 #include <linalg.hpp>
 #include <polyhedral.hpp>
 
@@ -8,7 +7,7 @@
 
 using namespace linalg;
 using namespace polyhedral;
-using namespace cli;
+using namespace io;
 
 int main(int argc, char** argv) {
     polyhedron<int> P;
@@ -25,14 +24,14 @@ int main(int argc, char** argv) {
                       << std::endl;
             std::cout << P << std::endl;
             std::cout << "P empty? " << (P.empty() ? "yes" : "no") << std::endl;
-            
+
             std::cin >> c;
             std::cout << std::endl << "(c) 1 x " << c.size() << std::endl;
             std::cout << c << std::endl << std::endl;
-            
+
             polyhedron<int> P_H = P.project(c);
             std::cout << "(P_H)" << std::endl;
-            std::cout << P.project(c) << std::endl;            
+            std::cout << P.project(c) << std::endl;
         } catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
         }
