@@ -26,11 +26,11 @@ using namespace polyhedral;
  */
 template <typename F>
 std::ostream& operator<<(std::ostream& os, const vecn<F>& vec) {
-    os << "(";
+    os << "[";
     for (size_t i = 0; i < vec.size(); i++) {
         os << " " << vec[i];
     }
-    os << " )";
+    os << " ]";
     return os;
 }
 
@@ -112,7 +112,7 @@ std::ostream&& operator<<(std::ostream&& os, const polyhedron<F>& P) {
 }
 
 /**
- * @brief Le um poliedro de uma stream.
+ * @brief Lê um poliedro de uma stream.
  *
  * @tparam F Tipo de escalar.
  *
@@ -125,7 +125,7 @@ template <typename F>
 std::istream& operator>>(std::istream& is, polyhedron<F>& P) {
     std::vector<parser::linear_inequality<F>> inequalities;
 
-    // Lê as inequações que define o poliedro, uma por linha, e computa o
+    // Lê as inequações que definem o poliedro, uma por linha, e computa o
     // número de colunas da matriz (i.e. o número de variáveis no sistema).
     size_t n = 0;
     size_t lineno = 1;

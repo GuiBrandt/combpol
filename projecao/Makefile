@@ -49,10 +49,10 @@ build-debug: $(BINDIR)/debug/combpol-projecao
 
 .PHONY: run run-debug
 run: build
-	@$(BINDIR)/release/combpol-projecao
+	@$(BINDIR)/release/combpol-projecao $(wildcard ./examples/*.combpol)
 
 run-debug: build-debug
-	@$(BINDIR)/debug/combpol-projecao
+	@$(BINDIR)/debug/combpol-projecao $(wildcard ./examples/*.combpol)
 
 #==============================================================================
 # Targets de teste
@@ -60,10 +60,10 @@ run-debug: build-debug
 
 .PHONY: memcheck-debug memcheck-release
 memcheck-debug: build-debug
-	@valgrind $(BINDIR)/debug/combpol-projecao
+	@valgrind $(BINDIR)/debug/combpol-projecao ./examples/2d.combpol
 
 memcheck-release: build-release
-	@valgrind $(BINDIR)/release/combpol-projecao
+	@valgrind $(BINDIR)/release/combpol-projecao ./examples/2d.combpol
 
 #==============================================================================
 # Targets binários

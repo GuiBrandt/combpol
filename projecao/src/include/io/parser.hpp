@@ -5,9 +5,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
-#include <initializer_list>
-#include <iterator>
-#include <limits>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -71,11 +68,14 @@ template <typename F> struct linear_inequality {
 class syntax_error : public std::exception {
   private:
     char m_what[1024];
+    size_t m_line;
+    size_t m_col;
 
   public:
     template <typename... Params>
     syntax_error(const char* filename, size_t line, size_t col,
-                 const char* format, Params&&... params) {
+                 const char* format, Params&&... params)
+        : m_line(line), m_col(col) {
         char reformat[1024];
         std::snprintf(reformat, sizeof(reformat),
                       "[%s@%zu:%zu] syntax error: %s", filename, line, col,
@@ -85,6 +85,10 @@ class syntax_error : public std::exception {
     }
 
     const char* what() const noexcept override { return m_what; }
+
+    size_t line() const noexcept { return m_line; }
+
+    size_t column() const noexcept { return m_col; }
 };
 
 /**
@@ -416,7 +420,7 @@ template <typename F> class parser {
      * @brief Lê um vetor de uma string dada.
      *
      * Gramática:
-     *  <vetor> ::= "(" (<escalar>)+ ")"
+     *  <vetor> ::= "[" (<escalar>)+ "]"
      *
      * @param begin Iterador para o início da string.
      * @param end Iterador para o fim da string.
@@ -429,14 +433,14 @@ template <typename F> class parser {
         begin = skip_blank(begin, end);
 
         // Todo vetor é delimitado por parênteses.
-        auto lparen_index = std::find(begin, end, '(');
+        auto lparen_index = std::find(begin, end, '[');
         if (lparen_index == end) {
-            fail(lparen_index, "expected '(', found <EOL>");
+            fail(lparen_index, "expected '[', found <EOL>");
         }
 
-        auto rparen_index = std::find(begin, end, ')');
+        auto rparen_index = std::find(begin, end, ']');
         if (lparen_index == end) {
-            fail(lparen_index, "expected ')', found <EOL>");
+            fail(lparen_index, "expected ']', found <EOL>");
         }
 
         // Um vetor é uma sequência (não-vazia) de escalares. A primeira
