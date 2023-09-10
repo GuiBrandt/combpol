@@ -40,38 +40,6 @@ std::ostream&& operator<<(std::ostream&& os, const vecn<F>& vec) {
 }
 
 /**
- * @brief Lê um vetor de uma stream.
- *
- * @tparam F Tipo de escalar.
- *
- * @param os Stream de entrada.
- * @param vec Vetor.
- *
- * @return std::ostream& Uma referência para a stream.
- */
-template <typename F> std::istream& operator>>(std::istream& is, vecn<F>& vec) {
-    std::string line;
-    if (std::getline(is, line)) {
-        std::vector<F> coords;
-        parser::parser<F>("<stdin>", line.begin(), line.end())
-            .parse_vector(line.begin(), line.end(), coords);
-        vec = vecn<F>(coords.size());
-        for (size_t i = 0; i < coords.size(); i++) {
-            vec[i] = coords[i];
-        }
-    } else {
-        throw std::ios_base::failure(
-            "could not read vector from input stream: reached EOS");
-    }
-    return is;
-}
-
-template <typename F>
-std::istream&& operator>>(std::istream&& is, vecn<F>& vec) {
-    return std::move(is >> vec);
-}
-
-/**
  * @brief Escreve um poliedro em uma stream.
  *
  * @tparam F Tipo de escalar.
@@ -109,60 +77,6 @@ std::ostream& operator<<(std::ostream& os, const polyhedron<F>& P) {
 template <typename F>
 std::ostream&& operator<<(std::ostream&& os, const polyhedron<F>& P) {
     return std::move(os << P);
-}
-
-/**
- * @brief Lê um poliedro de uma stream.
- *
- * @tparam F Tipo de escalar.
- *
- * @param os Stream de entrada.
- * @param P Referência para o poliedro.
- *
- * @return std::ostream& Uma referência para a stream.
- */
-template <typename F>
-std::istream& operator>>(std::istream& is, polyhedron<F>& P) {
-    std::vector<parser::linear_inequality<F>> inequalities;
-
-    // Lê as inequações que definem o poliedro, uma por linha, e computa o
-    // número de colunas da matriz (i.e. o número de variáveis no sistema).
-    size_t n = 0;
-    size_t lineno = 1;
-    for (std::string line; std::getline(is, line); lineno++) {
-        // Termina a leitura quando encontra uma linha em branco
-        if (line.find_first_not_of(' ') == std::string::npos) {
-            break;
-        }
-
-        parser::linear_inequality<F> inequality;
-        parser::parser<F>("<stdin>", lineno, line.begin(), line.end())
-            .parse_linear_inequality(line.begin(), line.end(), inequality);
-
-        n = std::max(n, inequality.lhs.max_variable + 1);
-        inequalities.push_back(std::move(inequality));
-    }
-
-    // Constrói a matriz A e vetor b correspondentes às inequações lidas.
-    auto m = inequalities.size();
-    matnxm<F> A(m, n);
-    vecn<F> b(m);
-
-    for (size_t i = 0; i < m; i++) {
-        const auto& inequality = inequalities[i];
-        for (const auto& m : inequality.lhs.parts) {
-            A(i, m.variable) = m.coefficient;
-        }
-        b[i] = inequality.rhs;
-    }
-
-    P = {std::move(A), std::move(b)};
-    return is;
-}
-
-template <typename F>
-std::istream&& operator>>(std::istream&& is, polyhedron<F>& P) {
-    return std::move(is >> P);
 }
 
 }; // namespace io
