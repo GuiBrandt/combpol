@@ -1,5 +1,16 @@
 # Combinatória Poliédrica - Projeções
 
+## Estrutura
+
+- `src/`: Código-fonte do programa
+    - `main.cpp`: Ponto de entrada
+    - `include/`: Arquivos de cabeçalho
+        - `io.hpp` / `io/parser.hpp`: Lógica de entrada/saída do programa, inclui leitura e exibição
+        de vetores e poliedros
+        - `linalg/vecn.hpp`, `linalg/matnxm.hpp`: Implementação de operações de vetores e matrizes.
+        - `polyhedral.hpp`: Implementação de operações em poliedros (projeção e
+        teste de vazio).
+
 ## Instruções
 
 O programa acompanha um arquivo [Makefile](./Makefile) com targets para compilar
