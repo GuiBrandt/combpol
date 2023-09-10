@@ -1,0 +1,76 @@
+[./examples/3d.in]
+(P) 6 x 3
+1x1 + 2x2 + -3x3 <= 10
+2x1 + 2x2 <= 5
+2x2 + 4x3 <= 3
+5x1 + 2x3 <= 7
+-1x1 <= 0
+-1x2 <= 0
+
+P is not empty
+
+Projected on direction [ 1 1 1 ]:
+1x1 + 2x2 + -3x3 <= 10
+-2x1 + 2x2 <= 5
+-6x1 + 2x2 + 4x3 <= 3
+-2x1 + 2x3 <= 7
+2x1 + -2x2 <= 5
+-4x2 + 4x3 <= 3
+5x1 + -7x2 + 2x3 <= 7
+
+Projected on direction [ 1 0 1 ]:
+-1x2 <= 0
+6x1 + 8x2 + -6x3 <= 30
+4x1 + 12x2 + -4x3 <= 46
+17x1 + 14x2 + -17x3 <= 84
+2x2 <= 5
+-4x1 + 2x2 + 4x3 <= 3
+-2x1 + 2x3 <= 7
+
+Projected on direction [ 0 1 1 ]:
+-1x1 <= 0
+4x1 + 6x2 + -6x3 <= 25
+6x1 + 14x2 + -14x3 <= 63
+7x1 + 4x2 + -4x3 <= 27
+2x1 <= 5
+-4x2 + 4x3 <= 3
+5x1 + -2x2 + 2x3 <= 7
+
+Projected on direction [ 1 1 0 ]:
+-2x1 + 2x2 + -3x3 <= 10
+-2x1 + 2x2 <= 5
+-2x1 + 2x2 + 4x3 <= 3
+2x3 <= 7
+1x1 + -1x2 + -3x3 <= 10
+2x1 + -2x2 <= 5
+4x3 <= 3
+5x1 + -5x2 + 2x3 <= 7
+
+Projected on direction [ 1 0 0 ]:
+2x2 + 4x3 <= 3
+-1x2 <= 0
+2x2 + -3x3 <= 10
+2x2 <= 5
+2x3 <= 7
+
+Projected on direction [ 0 1 0 ]:
+5x1 + 2x3 <= 7
+-1x1 <= 0
+1x1 + -3x3 <= 10
+2x1 <= 5
+4x3 <= 3
+
+Projected on direction [ 0 0 1 ]:
+2x1 + 2x2 <= 5
+-1x1 <= 0
+-1x2 <= 0
+4x1 + 14x2 <= 49
+17x1 + 4x2 <= 41
+
+Projected on direction [ 0 0 0 ]:
+1x1 + 2x2 + -3x3 <= 10
+2x1 + 2x2 <= 5
+2x2 + 4x3 <= 3
+5x1 + 2x3 <= 7
+-1x1 <= 0
+-1x2 <= 0

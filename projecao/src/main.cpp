@@ -88,7 +88,7 @@ class file_processor {
         for (size_t i = 0; i < m; i++) {
             const auto& inequality = inequalities[i];
             for (const auto& m : inequality.lhs.parts) {
-                A(i, m.variable) = m.coefficient;
+                A(i, m.variable) += m.coefficient;
             }
             b[i] = inequality.rhs;
         }

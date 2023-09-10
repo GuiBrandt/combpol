@@ -51,6 +51,12 @@ std::ostream&& operator<<(std::ostream&& os, const vecn<F>& vec) {
  */
 template <typename F>
 std::ostream& operator<<(std::ostream& os, const polyhedron<F>& P) {
+    // Se a matriz for vazia, escreve uma tautologia.
+    if (P.A().rows() == 0 || P.A().cols() == 0) {
+        os << "0 <= 0" << std::endl;
+        return os;
+    }
+
     for (size_t i = 0; i < P.A().rows(); i++) {
         auto row = P.A()[i];
         bool zero = true;

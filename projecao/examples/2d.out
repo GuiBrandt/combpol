@@ -1,0 +1,53 @@
+[./examples/2d.in]
+(P) 5 x 2
+1x1 + 2x2 <= 4
+3x1 <= 5
+2x1 + -1x2 <= 3
+-1x1 <= 0
+-1x2 <= 0
+
+P is not empty
+
+Projected on direction [ 1 1 ]:
+-2x1 + 2x2 <= 4
+0  <= 5
+1x1 + -1x2 <= 3
+1x1 + -1x2 <= 4
+3x1 + -3x2 <= 5
+2x1 + -2x2 <= 3
+
+Projected on direction [ 1 0 ]:
+-1x2 <= 0
+2x2 <= 4
+0  <= 5
+-1x2 <= 3
+
+Projected on direction [ 0 1 ]:
+3x1 <= 5
+-1x1 <= 0
+5x1 <= 10
+1x1 <= 4
+
+Projected on direction [ 1 -1 ]:
+6x1 + 6x2 <= 17
+5x1 + 5x2 <= 15
+1x1 + 1x2 <= 4
+0  <= 5
+-1x1 + -1x2 <= 3
+-1x1 + -1x2 <= 0
+
+Projected on direction [ 3 2 ]:
+-4x1 + 6x2 <= 12
+0  <= 15
+2x1 + -3x2 <= 9
+2x1 + -3x2 <= 8
+6x1 + -9x2 <= 10
+4x1 + -6x2 <= 6
+
+Projected on direction [ 2 3 ]:
+-6x1 + 4x2 <= 8
+0  <= 10
+3x1 + -2x2 <= 6
+3x1 + -2x2 <= 12
+9x1 + -6x2 <= 15
+6x1 + -4x2 <= 9

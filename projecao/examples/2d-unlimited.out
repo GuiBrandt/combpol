@@ -1,0 +1,24 @@
+[./examples/2d-unlimited.in]
+(P) 2 x 2
+-1x1 <= -2
+-1x2 <= -4
+
+P is not empty
+
+Projected on direction [ 1 1 ]:
+0 <= 0
+
+Projected on direction [ 1 0 ]:
+-1x2 <= -4
+
+Projected on direction [ 0 1 ]:
+-1x1 <= -2
+
+Projected on direction [ 1 -1 ]:
+-1x1 + -1x2 <= -6
+
+Projected on direction [ 2 3 ]:
+0 <= 0
+
+Projected on direction [ 3 2 ]:
+0 <= 0

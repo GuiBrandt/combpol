@@ -1,0 +1,24 @@
+[./examples/empty.in]
+(P) 2 x 5
+1x1 + 2x2 + 3x3 + 4x4 + 5x5 <= 5
+-1x1 + -2x2 + -3x3 + -4x4 + -5x5 <= -10
+
+P is empty
+
+Projected on direction [ 1 1 1 1 1 ]:
+0  <= -75
+
+Projected on direction [ 1 0 0 0 0 ]:
+0  <= -5
+
+Projected on direction [ 0 1 0 0 0 ]:
+0  <= -10
+
+Projected on direction [ 0 0 1 0 0 ]:
+0  <= -15
+
+Projected on direction [ 0 0 0 1 0 ]:
+0  <= -20
+
+Projected on direction [ 0 0 0 0 1 ]:
+0  <= -25

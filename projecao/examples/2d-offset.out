@@ -1,0 +1,31 @@
+[./examples/2d-offset.in]
+(P) 3 x 2
+-1x1 + -1x2 <= -2
+1x1 + -1x2 <= 1
+1x2 <= 2
+
+P is not empty
+
+Projected on direction [ 1 1 ]:
+1x1 + -1x2 <= 1
+-1x1 + 1x2 <= 2
+
+Projected on direction [ 1 0 ]:
+1x2 <= 2
+-2x2 <= -1
+
+Projected on direction [ 0 1 ]:
+-1x1 <= 0
+1x1 <= 3
+
+Projected on direction [ 1 -1 ]:
+-1x1 + -1x2 <= -2
+1x1 + 1x2 <= 5
+
+Projected on direction [ 1 2 ]:
+-2x1 + 1x2 <= 2
+2x1 + -1x2 <= 4
+
+Projected on direction [ 3 2 ]:
+4x1 + -6x2 <= 3
+-2x1 + 3x2 <= 6
