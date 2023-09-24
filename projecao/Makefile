@@ -39,6 +39,18 @@ clean:
 	@rm -rf $(BINDIR)
 
 #==============================================================================
+# Targets de compilação e execução (Docker)
+#==============================================================================
+
+.PHONY:
+build-docker: Dockerfile
+	docker build -t ghcr.io/guibrandt/combpol/combpol-projecao .
+
+.PHONY:
+run-docker: Dockerfile
+	docker run -v ./examples:/examples ghcr.io/guibrandt/combpol/combpol-projecao
+
+#==============================================================================
 # Targets de compilação e execução
 #==============================================================================
 

@@ -49,6 +49,18 @@ make clean build CXX=clang++
 A compilação foi testada com GCC 13.2.1 e Clang 16.0.5 em Linux. O programa
 requer suporte a C++14 ou mais recente.
 
+### Docker
+
+Também é possível executar o projeto pelo Docker:
+```
+make run-docker
+```
+
+Isso baixa a imagem docker do container registry do Github (alternativamente,
+é possível compilar a imagem localmente pelo comando `make build-docker`) e
+executa mapeando os arquivos da pasta `examples` no container, que executa o
+programa com o wildcard `examples/*.in` (vide [`Dockerfile`](./Dockerfile)).
+
 ## Formato de entrada
 
 Os arquivos de entrada do programa têm duas seções, separadas por uma linha em
