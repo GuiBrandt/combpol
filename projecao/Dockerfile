@@ -1,10 +1,10 @@
-FROM gcc:13.2 as builder
-COPY . /usr/src/projecao/
-WORKDIR /usr/src/projecao
+FROM gcc:8 as builder
+COPY ./src /usr/projecao/src
+COPY ./Makefile /usr/projecao/
+WORKDIR /usr/projecao
 RUN make build
 
-FROM manjarolinux/base:20230924
-RUN yes | sudo pacman -S make
-COPY --from=builder /usr/src/projecao/build/release/combpol-projecao /combpol-projecao
+FROM ubuntu:focal
+COPY --from=builder /usr/projecao/build/release/combpol-projecao /combpol-projecao
 WORKDIR /
 CMD ["bash", "-c", "./combpol-projecao examples/*.in"]

@@ -6,13 +6,13 @@ SHELL = /bin/sh
 #==============================================================================
 
 #CXX=g++
-CXXFLAGS=-std=c++14 -Wall -Wno-format-security -march=native
+CXXFLAGS=-std=c++14 -Wall -Wno-format-security
 
 # Flags usadas na compilação para depuração
 DBG_CXXFLAGS=-g -Og
 
 # Flags usadas na compilação final
-REL_CXXFLAGS=-O3 -DNOEXCEPT -DNDEBUG
+REL_CXXFLAGS=-O2 -DNOEXCEPT -DNDEBUG
 
 #==============================================================================
 # Variáveis de estrutura do projeto
@@ -44,11 +44,11 @@ clean:
 
 .PHONY:
 build-docker: Dockerfile
-	docker build -t ghcr.io/guibrandt/combpol/combpol-projecao .
+	docker build -t ghcr.io/guibrandt/combpol/combpol-projecao:gcc-8-ubuntu .
 
 .PHONY:
 run-docker: Dockerfile
-	docker run -v ./examples:/examples ghcr.io/guibrandt/combpol/combpol-projecao
+	docker run -v ./examples:/examples ghcr.io/guibrandt/combpol/combpol-projecao:gcc-8-ubuntu
 
 #==============================================================================
 # Targets de compilação e execução
