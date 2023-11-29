@@ -1,0 +1,297 @@
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{everysel}
+\usepackage{mathrsfs}
+
+\DeclareMathOperator{\conv}{\mathrm{conv}}
+
+% Capa
+\title{Coloração de Arestas}
+\subtitle{
+    Nemhauser, George L. e Sungsoo Park.\\
+    ``A polyhedral approach to edge coloring.''\\
+    Operations Research Letters 10.6 (1991): 315-322.}
+\author{Guilherme Guidotti Brandt (235970)}
+\institute{IC - Unicamp}
+\date{}
+
+\begin{document}
+    \frame{\titlepage}
+
+    \begin{frame}{Problema da coloração de arestas}
+
+        {\bf Problema da coloração de arestas}: Dado um grafo {\color{blue}$G = (V, E)$}, encontrar uma atribuição de cores às arestas de {\color{blue}$G$} com o menor número de cores, de forma que arestas adjacentes tenham cores distintas.
+
+        \pause
+        \vspace{.5cm}
+        Equivalente: encontrar uma decomposição por emparelhamentos de {\color{blue}$G$} de cardinalidade mínima.
+        
+        \vspace{.5cm}
+        \pause
+        O {\color{blue} índice cromático $\chi^\prime(G)$} é o menor número de cores necessário para colorir as arestas do grafo {\color{blue} $G$}.
+
+        \vspace{.5cm}
+        \pause
+        Politopo:
+        $${\color{blue} P_\mathrm{ColA}(G)} = \conv \{{\color{blue} \chi^C} \colon {\color{blue} C} \text{ é uma {\color{blue} coloração de arestas} de } {\color{blue} G} \}$$
+    \end{frame}
+
+    \begin{frame}{Teorema de Vizing}
+
+        {\color{blue} \bf Teorema (Vizing)}. Se $G$ é um grafo simples, então {\color{blue} $\chi^\prime(G) = \Delta(G)$} ou {\color{blue} $\Delta(G) + 1$}.
+        \pause
+
+        \vspace{.5cm}
+        {\color{blue} {\bf Prova}}. Existe um algoritmo que dá uma coloração com {\color{blue} $\Delta(G) + 1$} cores para qualquer grafo simples  em tempo polinomial {\color{blue} (Ehrenfeucht, Faber \& Kierstead, 1984; Lovasz, Plummer, 1986)}. \qed
+        \pause
+
+        \vspace{.5cm}
+        Sobra um problema de decisão: decidir se um grafo simples {\color{blue} $G$} pode ser colorido com exatamente {\color{blue} $\Delta(G)$} cores.
+        \begin{itemize}
+            \item Problema NP-completo mesmo quando restrito a grafos 3-regulares {\color{blue} (Holyer, 1981)}.
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Formulação com PLI}
+        O problema é equivalente a encontrar uma cobertura das arestas por emparelhamentos maximais no grafo:
+        {\color{blue}
+            \begin{align*}
+                (\mathrm{IP})\quad&\chi^\prime(G) = \min \mathbf{1} x\\
+                &Ax \geq \mathbf{1}\\
+                &x \in \mathbb{Z}_{\geq 0}
+            \end{align*}
+        }
+        Onde {\color{blue} $A$} é a matriz de incidência das arestas e emparelhamentos de {\color{blue} $G$}, i.e., {\color{blue} $a_{ij} = 1$} sse a aresta {\color{blue} $i$} é parte do emparelhamento {\color{blue} $j$}.
+        \pause
+        A matriz {\color{blue} $A$} tem {\color{blue} $|E|$} linhas, e uma coluna para cada emparelhamento maximal em {\color{blue} $G$}.
+
+        \pause
+        \vspace{.25cm}
+        Podemos notar que, em qualquer solução ótima, {\color{blue} $x \in \mathbb{B}$}.
+
+        \pause
+        \vspace{.25cm}
+        A cobertura não precisa ser exata: se alguma aresta é escolhida duas vezes, podemos escolher arbitrariamente um dos emparelhamentos da solução em que ela aparece.
+    \end{frame}
+
+    \begin{frame}{Formulação com PLI}
+        Outras formulações são possíveis com número polinomial de variáveis. Por exemplo, com variáveis {\color{blue} $x_{e,c} = 1$} sse a aresta {\color{blue} $e$} tem a cor {\color{blue} $c$}. Um problema desse tipo de formulação é a quantidade de simetrias.
+
+        \vspace{.5cm}
+        \pause
+        A formulação {\color{blue} $(\mathrm{IP})$} é interessante porque a relaxação linear dá uma aproximação boa de {\color{blue} $\chi^\prime(G)$}, e permite explorar geração de colunas na solução do problema.
+    \end{frame}
+
+    \begin{frame}{Problema da coloração fracionária de arestas}
+
+        Temos a seguinte relaxação linear de {\color{blue} $(\mathrm{IP})$} e seu dual:
+        {\color{blue}
+            \begin{align*}
+                (\mathrm{LP})\quad&\chi^\prime_\mathrm{LP}(G) = \min \mathbf{1} x
+                &(\mathrm{DLP})\quad&z_\mathrm{DLP}(G) = \max \mathbf{1} u\\
+                &A x \geq 1&&A^\top u \leq 1\\
+                &x \geq 0&&u \geq 0                
+            \end{align*}
+        }
+        Note que o dual corresponde a atribuir pesos não-negativos a arestas em {\color{blue} $G$} de forma que a soma dos pesos em cada emparelhamento não ultrapasse 1, maximizando a soma dos custos das arestas.
+
+        \pause
+        \vspace{.5cm}
+        {\color{blue} {\bf Proposição}}. {\color{blue} $\chi^\prime_\mathrm{LP}(G) \geq \Delta(G)$}
+
+        \vspace{.5cm}
+        {\color{blue} {\bf Prova}}. O conjunto de arestas incidentes sobre um vértice de grau {\color{blue} $\Delta(G)$} em {\color{blue} $G$} dá uma solução viável para o dual com custo {\color{blue} $\Delta(G)$}. \qed
+    \end{frame}
+
+    \begin{frame}{Problema da coloração fracionária de arestas}
+
+        {\color{blue} {\bf Proposição}}. Se {\color{blue} $\chi^\prime_\mathrm{LP}(G) > \Delta(G)$}, então {\color{blue} $\chi^\prime(G) = \Delta(G) + 1$}, e se {\color{blue} $\chi^\prime_\mathrm{LP}(G) = \Delta(G)$} e existe solução ótima inteira de {\color{blue} $(\mathrm{LP})$}, então {\color{blue} $\chi^\prime(G) = \Delta(G)$}. \qed
+        \pause
+
+        \vspace{.5cm}
+        {\color{blue} {\bf Teorema}}. O problema da otimização para o programa linear {\color{blue} $(\mathrm{LP})$} pode ser resolvido em tempo polinomial.
+
+        \pause
+        \vspace{.5cm}
+        {\color{blue} {\bf Prova}}. Basta mostrar que {\color{blue} $(\mathrm{DLP})$} é separável em tempo polinomial.
+        \pause
+        O problema da separação para {\color{blue} $(\mathrm{DLP})$} corresponde a, dada uma atribuição de pesos não-negativos para as arestas de {\color{blue} $G$}, encontrar um emparelhamento de peso acima de 1.
+        \pause
+        Isso pode ser feito em tempo polinomial com um algoritmo de emparelhamento de custo máximo (e.g. algoritmo de Edmonds). \qed
+
+        \pause
+        \vspace{.5cm}
+        Fica um caso remanescente: {\color{blue} $\chi^\prime_\mathrm{LP}(G) = \Delta(G)$}, mas nenhuma solução ótima conhecida é inteira.
+    \end{frame}
+
+    \begin{frame}{Desigualdades válidas}
+        Seja {\color{blue} $S \subseteq V$} e {\color{blue} $E(S)$} o conjunto de arestas com ambos os extremos em {\color{blue}$S$}. Um pareamento qualquer pode cobrir no máximo {\color{blue} $\lfloor \frac{1}{2} |U| \rfloor$} arestas de {\color{blue} $E(U)$}.
+
+        \pause
+        \vspace{.5cm}
+        Isso nos dá a seguinte família de desigualdades válidas para {\color{blue} $P_{ColA}(G)$ (Seymour, 1979; Stahl, 1979)}:
+        {\color{blue}
+        \begin{align*}
+            \sum_{\{j \colon M_j \cap E^\prime \neq \emptyset\}} x_j \geq \left\lceil \dfrac{|E^\prime|}{\lfloor \frac{1}{2} |U| \rfloor} \right\rceil
+            &&\forall U \subseteq V, E^\prime \subseteq E(U)
+        \end{align*}
+        }
+
+        onde a variável {\color{blue} $x_j$} corresponde ao emparelhamento maximal {\color{blue} $M_j$}.
+    \end{frame}
+
+    \begin{frame}{Desigualdades válidas}
+        Em particular, é interessante pensar no caso em que {\color{blue} $|U| = k$} é ímpar e o subgrafo {\color{blue} $C = (U, E^\prime) \subseteq G$} é um ciclo. Nesse caso, {\color{blue}
+        $$\left\lceil \dfrac{|E^\prime|}{\lfloor \frac{1}{2} |U| \rfloor} \right\rceil = \lceil (2k + 1)/k \rceil = 3$$
+        }
+        \pause
+        e temos a família de restrições de ciclos ímpares
+        {\color{blue}
+        \begin{align*}
+            \sum_{\{j \colon M_j \cap C \neq \emptyset\}} x_j \geq 3
+            &&\forall \text{ ciclo ímpar } C
+        \end{align*}
+        }
+        \pause
+        Essas restrições em geral não são combinação cônica das restrições de {\color{blue} $(\mathrm{LP})$} (exceto quando {\color{blue} $|C| = 3$}). Para alguns grafos essas restrições definem faceta {\color{blue} (Park, 1989)}.
+    \end{frame}
+
+    \begin{frame}{Separação para grafos 3-regulares}
+        Seja {\color{blue} $(\mathrm{ALP})$} o programa linear obtido adicionando as restrições de cíclos ímpares em {\color{blue} $(\mathrm{LP})$} e {\color{blue} $\chi^\prime_\mathrm{ALP}(G)$} seu valor ótimo.
+
+        \vspace{0.5cm}
+        {\color{blue} \bf Teorema}. Se {\color{blue} $G$} é 3-regular e {\color{blue} $\chi^\prime(G) = 4$}, então {\color{blue} $\chi^\prime_\mathrm{ALP}(G) > 3$}.
+
+        \pause
+        \vspace{0.5cm}
+        Com isso, no caso em que {\color{blue} $G$} é 3-regular, {\color{blue} $\chi_{LP}(G) = 3$} e a solução ótima é facionária, podemos resolver o problema da separação com as restrições de ciclo ímpar: basta remover um emparelhamento com peso positivo para encontrar uma 3-coloração ou uma restrição de ciclo ímpar violada.
+    \end{frame}
+
+    \begin{frame}{Generalização}
+        O teorema anterior pode ser generalizado para grafos de qualquer índice cromático:
+
+        \pause
+        Seja {\color{blue} $\mathscr{G}_{k-1}$} a família de grafos com {\color{blue} $\Delta = k - 1$} e {\color{blue} $\chi^\prime$ = k}.
+        
+        \pause
+        Para um grafo {\color{blue} $G$} com {\color{blue} $\Delta = k$}, as desigualdades de ciclos ímpares podem ser generalizadas para:
+        {\color{blue}
+        \begin{align*}
+            \sum_{\{j \colon M_j \cap H \neq \emptyset\}} x_j \geq k
+            &&\forall H \subseteq G, H \in \mathscr{G}_{k-1}
+        \end{align*}
+        }
+        \pause
+        Defina {\color{blue} $(\mathrm{ALP}_k)$} como o problema linear obtido adicionando essas restrições a {\color{blue} $(\mathrm{LP})$}. Temos o seguinte teorema:
+
+        \vspace{0.5cm}
+        {\color{blue} \bf Teorema}. Se {\color{blue} $G$} é k-regular e {\color{blue} $\chi^\prime(G) = k + 1$}, então {\color{blue} $\chi^\prime_\mathrm{ALP_k}(G) > k$}.
+
+        \pause
+        \vspace{0.5cm}
+        Infelizmente, a separação nesse caso parece ser bem mais difícil.
+    \end{frame}
+
+    \begin{frame}{Geração de colunas}
+
+        A formulação {\color{blue} $LP$} tem um número de variáveis exponencial no tamanho do grafo. Seria inviável resolver normalmente.
+
+        \pause
+        \vspace{0.5cm}
+        Para contornar isso, podemos executar o Simplex olhando apenas para a base, e ``gerar'' colunas com custo reduzido negativo conforme necessário.
+
+        \pause
+        \vspace{0.5cm}
+        O custo reduzido da variável (coluna) {\color{blue} $j$} é dado por
+        {\color{blue} $$r_j = c_j - u^\top A_{*j}$$}
+        Onde {\color{blue} $c$} é a direção de otimização, {\color{blue} $u$} é o vetor das variáveis duais e {\color{blue} $A$} é a matriz que define o poliedro.
+    \end{frame}
+
+    \begin{frame}{Geração de colunas}
+
+        Podemos encontrar uma coluna com custo reduzido negativo resolvendo o seguinte problema de otimização:
+        {\color{blue}
+            \begin{align*}
+                (\mathrm{PR})\quad&z(u) = \max u^T a_j\\
+                &a_j \in A
+            \end{align*}
+        }
+        Isto é, encontrar uma coluna de {\color{blue} $A$} cujo produto interno com {\color{blue} $u^T$} seja máximo (minimizando o custo reduzido).
+        
+        \pause
+        \vspace{0.5cm}
+        Se {\color{blue} $z(u) > c_j$}, a coluna {\color{blue} $j$} entra na base; se não, não existe coluna com custo reduzido negativo, e o Simplex termina.
+    \end{frame}
+
+    \begin{frame}{Geração de colunas para (LP)}
+        
+        Temos o seguinte programa linear:
+        {\color{blue}
+        \begin{align*}
+            (\mathrm{LP})\quad&\chi^\prime_\mathrm{LP}(G) = \min \mathbf{1} x\\
+            &A x \geq 1\\
+            &x \geq 0
+        \end{align*}}
+        \pause
+        Que nos dá o seguinte problema de precificação:
+        {\color{blue}
+        \begin{align*}
+            (\mathrm{PR})\quad&z(w) = \max w^T y\\
+            &\sum_{e \in \delta(v)} y_e \leq 1 &\forall v \in V\\
+            &y_e \in \mathbb{B}&\forall e \in E
+        \end{align*}}
+        \pause
+        Que é equivalente a emparelhamento de custo máximo (onde os custos são dados por {\color{blue} $w$}, o vetor das variáveis duais no problema mestre).
+    \end{frame}
+
+    \begin{frame}{Geração de colunas para (ALP)}
+
+        Temos o seguinte programa linear:
+        {\color{blue}
+        \begin{align*}
+            (\mathrm{ALP})\quad&\chi^\prime_\mathrm{LP}(G) = \min \mathbf{1} x\\
+            &A x \geq 1\\
+            &\sum_{\{j \colon M_j \cap C \neq \emptyset\}} x_j \geq 3
+            &\forall \text{ ciclo ímpar } C\\
+            &x \geq 0
+        \end{align*}}
+    \end{frame}
+
+    \begin{frame}{Geração de colunas para (ALP)}
+
+        Que nos dá o seguinte problema de precificação:
+        {\color{blue}
+        \begin{align*}
+            (\mathrm{PRA})\quad&z(w, u) = \max w^T y + u^\top \pi\\
+            &\sum_{e \in \delta(v)} y_e \leq 1 &\forall v \in V\\
+            &\sum_{e \in E(S)} y_e \leq \frac{1}{2}(|S| - 1) &\forall S \subseteq V, |S|\text{ ímpar}\\
+            &\pi_C \leq \sum_{e \in C} y_e&\forall\text{ ciclo ímpar }C\\
+            &\pi_C \in \mathbb{B}&\forall\text{ ciclo ímpar }C\\
+            &y_e \in \mathbb{B}&\forall e \in E
+        \end{align*}}
+        Onde {\color{blue} $w$} é o vetor de variáveis duais das restrições de aresta e {\color{blue} $u$} das restrições de ciclos ímpares.
+    \end{frame}
+
+    \begin{frame}{Algoritmo para grafos 3-regulares}
+
+        \begin{enumerate}
+            \item Inicialize o Simplex com um conjunto razoável de colunas que permita uma solução
+            \begin{itemize}
+                \item Isso pode ser feito usando o Teorema de Vizing e/ou soluções heurísticas.
+            \end{itemize}
+            \item Resolva a relaxação linear do problema.
+            \item Se o valor ótimo é 3:
+            \begin{enumerate}
+                \item Se a solução é inteira ou nenhuma restrição de ciclo ímpar foi violada, termina com {\color{blue} $\chi^\prime(G) = 3$}.
+                \item Se a solução não é inteira e alguma restrição de ciclo ímpar foi violada, adiciona ao sistema e volta ao passo {\color{blue} 2}.
+            \end{enumerate}
+            \item Se o valor ótimo é maior que 3, gere uma coluna com o problema de precificação.
+            \begin{enumerate}
+                \item Se o preço da solução ótima for maior que 1, adicione a coluna e volte ao passo {\color{blue} 2}.
+                \item Se não, não existe coluna com preço reduzido negativo, e termina com {\color{blue} $\chi^\prime(G) = 4$}.
+            \end{enumerate}
+        \end{enumerate}
+    \end{frame}
+\end{document}

@@ -1,0 +1,71 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=.8in,footskip=0.25in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+
+\title{Coloração de Arestas}
+
+\begin{document}
+    \subsection*{Teorema de Vizing}
+    \begin{itemize}
+        \item Graph Theory (Bondy \& Murty), 2008, cap. 17, seção 2 
+    \end{itemize}
+
+    \subsection*{Coloração fracionária}
+
+        {\bf Proposição}. $\chi^\prime_\mathrm{LP}(G) \geq \Delta(G)$
+
+        \vspace{0.5cm}
+        {\bf Explicação da prova}. Arestas que incidem sobre um mesmo vértice estão, necessariamente, em emparelhamentos diferentes. Nesse caso, se temos $\Delta(G)$ arestas, necessariamente temos $\Delta(G)$ emparelhamentos diferentes.
+
+
+    \subsection*{Desigualdades válidas}
+
+    \subsubsection*{Intuição}
+    As desigualdades dizem que o número de emparelhamentos que ``tocam'' $E^\prime$ tem que ser maior ou igual ao teto do tamanho de $E^\prime$ sobre o chão de metade do tamanho de $U$.
+
+    Como cada emparelhamento cobre no máximo $\lfloor \frac{1}{2} |U| \rfloor$ vértices, para cobrir $|E^\prime|$ arestas, precisamos de $$\left\lceil \frac{|E^\prime|}{\lfloor \frac{1}{2} |U| \rfloor}\right\rceil$$
+    emparelhamentos.
+
+    \subsubsection*{Facetas}
+
+    Difícil conseguir acesso à citação (tese de doutorado do autor). Menciona o caso em que $G$ é completo ou um ciclo ímpar $>$ 3 (segundo pesquisa no Google Books).
+
+    \pagebreak
+    \subsection*{Separação para grafos 3-regulares}
+    {\bf Teorema}. Se $G$ é 3-regular e $\chi^\prime(G) = 4$, então $\chi^\prime_\mathrm{ALP}(G) > 3$.
+    {\bf Prova}.
+
+    \begin{itemize}
+        \item Suponha que $\chi_\mathrm{ALP}(G) = 3$, e seja $x^*$ uma solução ótima.
+        \item Como $\chi^\prime(G) = 4$, $x^*$ é fracionário.
+        \item Por hipótese, $\mathbf{1} x^* = 3$.
+        \item
+            Como $G$ é 3-regular, $|E| = \frac{3}{2}|V|$.
+            \begin{itemize}
+                \item Segue do lema do aperto de mão
+            \end{itemize}
+        \item Segue que cada emparelhamento com $x^*_j > 0$ cobre $\frac{1}{2}|V|$ arestas, e portanto é perfeito.
+        \begin{itemize}
+            \item Intuição: como precisamos cobrir $\frac{3}{2}|V|$ arestas, cada emparelhamento cobre no máximo $\frac{1}{2}|V|$ arestas, e $\mathbf{1} x^* = 3$, se escolhermos um emparelhamento que não seja perfeito, fica faltando.
+            \item Argumento de contagem: como combinação cônica das desigualdades das linhas de $A$ ($A_{e*} x \geq 1$),temos $1^\top A x \geq |E| = \frac{3}{2}|V|$. Mas $1^\top A \leq \frac{1}{2}|V|$ (número de arestas em um emparelhamento), então $$1^\top A x \leq \sum_j \dfrac{|V|}{2} x_j = \dfrac{|V|}{2} \sum_j x_j = \dfrac{3|V|}{2}$$
+            Mas então $1^\top A x = \dfrac{3|V|}{2}$.
+        \end{itemize}
+        \item Seja $G^\prime$ um subgrafo de $G$ com um tal emparelhamento removido.
+        \item Todo vértice em $G^\prime$ tem grau 2. Além disso, $\sum_{j \in E(G^\prime)} x^*_j < 3$ (porque tiramos um emparelhamento que tinha $x^*_j$ positivo).
+        \item Temos dois casos:
+        \begin{enumerate}
+            \item Se todo ciclo em $G^\prime$ é par, então $\chi^\prime(G^\prime) = 2$ e podemos colorir o emparelhamento removido de uma terceira cor, logo $\chi^\prime(G) = 3$, uma contradição.
+            \item Se existe pelo menos um ciclo ímpar em $G^\prime$, a soma dos valores $x^*_j$ dos emparelhamentos que cobrem o ciclo é estritamente menor que 3, e portanto a solução viola a restrição de ciclo ímpar correspondente, também uma contradição.
+        \end{enumerate}
+        \item Logo, $\chi_\mathrm{ALP}(G) > 3$. $\blacksquare$
+    \end{itemize}
+
+
+    \subsection*{Generalização}
+    \begin{itemize}
+        \item Podemos notar que ciclos ímpares são casos especiais de grafos com grau máximo $\Delta - 1$ (no caso, 2) e que precisam de $\Delta$ (no caso, 3) cores.
+    \end{itemize}
+\end{document}
