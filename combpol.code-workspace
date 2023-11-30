@@ -4,6 +4,9 @@
 			"path": "projecao"
 		},
 		{
+			"path": "branch-and-cut"
+		},
+		{
 			"path": "."
 		}
 	],
