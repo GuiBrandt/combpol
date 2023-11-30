@@ -26,7 +26,7 @@
 
         \pause
         \vspace{.5cm}
-        Equivalente: encontrar uma decomposição por emparelhamentos de {\color{blue}$G$} de cardinalidade mínima.
+        Equivalente: encontrar uma decomposição por emparelhamentos (que vamos chamar de {\color{blue} coloração de arestas}) de {\color{blue}$G$} de cardinalidade mínima.
         
         \vspace{.5cm}
         \pause
@@ -162,11 +162,14 @@
         Seja {\color{blue} $(\mathrm{ALP})$} o programa linear obtido adicionando as restrições de cíclos ímpares em {\color{blue} $(\mathrm{LP})$} e {\color{blue} $\chi^\prime_\mathrm{ALP}(G)$} seu valor ótimo.
 
         \vspace{0.5cm}
+        {\color{blue} \bf Lema}. Se {\color{blue} $G$} é 3-regular e {\color{blue} $\chi^\prime_\mathrm{ALP}(G) = 3$}, então todo emparelhamento com peso positivo na solução ótima é perfeito.
+
+        \vspace{0.5cm}
         {\color{blue} \bf Teorema}. Se {\color{blue} $G$} é 3-regular e {\color{blue} $\chi^\prime(G) = 4$}, então {\color{blue} $\chi^\prime_\mathrm{ALP}(G) > 3$}.
 
         \pause
         \vspace{0.5cm}
-        Com isso, no caso em que {\color{blue} $G$} é 3-regular, {\color{blue} $\chi_{LP}(G) = 3$} e a solução ótima é facionária, podemos resolver o problema da separação com as restrições de ciclo ímpar: basta remover um emparelhamento com peso positivo para encontrar uma 3-coloração ou uma restrição de ciclo ímpar violada.
+        Com isso, no caso em que {\color{blue} $G$} é 3-regular e a solução ótima é facionária com custo 3, podemos resolver o problema da separação com as restrições de ciclo ímpar em tempo polinomial: basta remover um emparelhamento com peso positivo para encontrar uma 3-coloração ou uma restrição de ciclo ímpar violada.
     \end{frame}
 
     \begin{frame}{Generalização}
@@ -266,8 +269,8 @@
         \begin{align*}
             (\mathrm{PRA})\quad&z(w, u) = \max w^T y + u^\top \pi\\
             &\sum_{e \in \delta(v)} y_e \leq 1 &\forall v \in V\\
-            &\sum_{e \in E(S)} y_e \leq \frac{1}{2}(|S| - 1) &\forall S \subseteq V, |S|\text{ ímpar}\\
             &\pi_C \leq \sum_{e \in C} y_e&\forall\text{ ciclo ímpar }C\\
+            \uncover<2->{&\sum_{e \in E(S)} y_e \leq \frac{1}{2}(|S| - 1) &\forall S \subseteq V, |S|\text{ ímpar}}\\
             &\pi_C \in \mathbb{B}&\forall\text{ ciclo ímpar }C\\
             &y_e \in \mathbb{B}&\forall e \in E
         \end{align*}}
@@ -294,4 +297,22 @@
             \end{enumerate}
         \end{enumerate}
     \end{frame}
+
+
+    \begin{frame}{Resultados computacionais}
+
+        \begin{itemize}
+            \item Algoritmo implementado em FORTRAN, executado em um IBM 9375, com método simplex para programação linear e branch-and-bound para programação inteira.
+            
+            \item Testado com instâncias aleatórias e alguns snarks (grafos 3-regulares com índice cromático 4 e giro $\geq 5$).
+            
+            \begin{itemize}
+                \item Os grafos aleatórios gerados eram todos 3-coloríveis, o que que é esperado: quase todos os grafos têm índice cromático igual ao seu grau máximo {\color{blue} (Erdős e Wilson, 1977)}.
+                \item Em geral, o algoritmo não encontra muitas soluções inteiras: os cortes não descrevem muito precisamente o poliedro para grafos 3-regulares e 3-coloríveis.
+                \item Em geral, vários cortes são necessários para mostrar que os snarks precisam de 4 cores.
+                \item O tempo de execução geralmente é dominado pela geração de colunas.
+            \end{itemize}
+        \end{itemize}
+    \end{frame}
+
 \end{document}
