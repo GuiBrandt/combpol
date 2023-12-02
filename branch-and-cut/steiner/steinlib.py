@@ -28,10 +28,10 @@ def _next_line(file: IO) -> str:
     """Encontra e devolve a próxima linha não-vazia do arquivo."""
     while True:
         line = file.readline()
-        if len(line) == 0: # readline retorna vazio no fim do arquivo
+        if len(line) == 0:  # readline retorna vazio no fim do arquivo
             raise EOFError()
         line = line.rstrip()
-        if len(line) > 0: # ignora linhas em branco
+        if len(line) > 0:  # ignora linhas em branco
             return line
 
 
@@ -79,7 +79,7 @@ def _read_terminals(file: IO) -> [int]:
 
 def read_steinlib_instance(file: IO) -> SteinLibInstance:
     """Lê uma instância de problema de Steiner em formato STP de um arquivo.
-    
+
     Argumentos
     ----------
     file : IO

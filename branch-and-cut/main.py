@@ -1,6 +1,7 @@
 #!/usr/env python3
 
 import argparse
+import networkx as nx
 
 from steiner.steinlib import read_steinlib_instance
 import steiner.solver as solver
@@ -15,4 +16,9 @@ if __name__ == "__main__":
 
     with open(args.instance, 'r') as file:
         instance = read_steinlib_instance(file)
-        print(solver.solve(instance))
+
+        G = nx.Graph()
+        G.add_weighted_edges_from(instance.edges)
+        Z = set(instance.terminals)
+
+        print(solver.solve(G, Z))
