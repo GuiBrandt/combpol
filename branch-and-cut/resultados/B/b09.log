@@ -1,0 +1,56 @@
+
+Gurobi 10.0.3 (linux64) logging started Fri Dec 15 17:11:56 2023
+
+Set parameter LogFile to value "resultados/B/b09.log"
+Set parameter Cutoff to value 220
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 38 rows, 94 columns and 106 nonzeros
+Model fingerprint: 0x2f28cdc6
+Variable types: 0 continuous, 94 integer (94 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 12 rows and 9 columns
+Presolve time: 0.00s
+Presolved: 26 rows, 85 columns, 86 nonzeros
+Variable types: 0 continuous, 85 integer (85 binary)
+
+Root relaxation: objective 1.080000e+02, 22 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  108.00000    0    -          -  108.00000      -     -    0s
+     0     0  158.50000    0   10          -  158.50000      -     -    0s
+     0     0  185.00000    0    4          -  185.00000      -     -    0s
+     0     0  197.50000    0    6          -  197.50000      -     -    0s
+     0     0  202.50000    0    7          -  202.50000      -     -    0s
+     0     0  206.16667    0   16          -  206.16667      -     -    0s
+     0     0  210.00000    0    -          -  210.00000      -     -    0s
+     0     0  210.00000    0    5          -  210.00000      -     -    0s
+     0     0  211.00000    0    6          -  211.00000      -     -    0s
+     0     0  211.07143    0   14          -  211.07143      -     -    0s
+     0     2  211.30556    0   16          -  211.30556      -     -    0s
+*   94    26              15     220.0000000  216.12500  1.76%  17.2    0s
+
+Cutting planes:
+  User: 79
+  Gomory: 1
+  MIR: 4
+  Lazy constraints: 91
+
+Explored 126 nodes (2089 simplex iterations) in 0.77 seconds (0.03 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 220 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.200000000000e+02, best bound 2.200000000000e+02, gap 0.0000%
+
+User-callback calls 495, time in user-callback 0.61 sec

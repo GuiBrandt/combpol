@@ -1,0 +1,51 @@
+
+Gurobi 10.0.3 (linux64) logging started Fri Dec 15 18:17:49 2023
+
+Set parameter LogFile to value "resultados/I080/i080-105.log"
+Set parameter Cutoff to value 3826
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 8 rows, 120 columns and 34 nonzeros
+Model fingerprint: 0x570d3ac5
+Variable types: 0 continuous, 120 integer (120 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [9e+01, 3e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 2 rows and 1 columns
+Presolve time: 0.00s
+Presolved: 6 rows, 119 columns, 25 nonzeros
+Variable types: 0 continuous, 119 integer (119 binary)
+
+Root relaxation: objective 1.300000e+03, 6 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1300.00000    0    -          - 1300.00000      -     -    0s
+     0     0 1494.50000    0    4          - 1494.50000      -     -    0s
+     0     0 1734.50000    0    3          - 1734.50000      -     -    0s
+     0     0 1851.00000    0    3          - 1851.00000      -     -    0s
+     0     0 1896.00000    0    5          - 1896.00000      -     -    0s
+     0     0 1926.80000    0   14          - 1926.80000      -     -    0s
+     0     2 1959.66667    0   12          - 1959.66667      -     -    0s
+*  523   234               4    2203.0000000 2111.00000  4.18%   8.9    1s
+
+Cutting planes:
+  User: 135
+  MIR: 3
+  Lazy constraints: 243
+
+Explored 707 nodes (5505 simplex iterations) in 1.48 seconds (0.09 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 2203 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.203000000000e+03, best bound 2.203000000000e+03, gap 0.0000%
+
+User-callback calls 1731, time in user-callback 1.31 sec

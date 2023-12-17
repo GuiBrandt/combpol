@@ -1,0 +1,78 @@
+
+Gurobi 10.0.3 (linux64) logging started Sun Dec 17 00:34:40 2023
+
+Set parameter LogFile to value "resultados/C/c20.log"
+Set parameter Cutoff to value 341
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 250 rows, 12500 columns and 12510 nonzeros
+Model fingerprint: 0x16fd7f4a
+Variable types: 0 continuous, 12500 integer (12500 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve time: 0.02s
+Presolved: 250 rows, 12500 columns, 12510 nonzeros
+Variable types: 0 continuous, 12500 integer (12500 binary)
+
+Root relaxation: objective 1.425000e+02, 342 iterations, 0.01 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  142.50000    0    7          -  142.50000      -     -    0s
+     0     0  259.00000    0   46          -  259.00000      -     -   44s
+     0     0  259.50000    0   26          -  259.50000      -     -   44s
+     0     0  260.00000    0   46          -  260.00000      -     -   44s
+     0     0  260.00000    0    -          -  260.00000      -     -   45s
+     0     0  260.00000    0   31          -  260.00000      -     -   45s
+     0     2  260.00000    0   15          -  260.00000      -     -  224s
+     1     4  260.00000    1   52          -  260.00000      -   465  226s
+     7    12  260.00000    3   46          -  260.00000      -   100  232s
+    11    16  260.00000    3   46          -  260.00000      -  66.6  236s
+    19    24  260.00000    4   44          -  260.00000      -  41.3  242s
+    23    28  260.00000    5   38          -  260.00000      -  35.3  245s
+    31    59  260.00000    6   40          -  260.00000      -  29.1  255s
+    58   218  260.00000   10   42          -  260.00000      -  19.0  280s
+    74   218  260.00000   18   33          -  260.00000      -  16.2  285s
+    92   218  260.00000   32   19          -  260.00000      -  14.2  290s
+   139   218  260.00000   40   14          -  260.00000      -  11.0  300s
+   219   583  260.00000   35   42          -  260.00000      -   9.0  372s
+   230   583  260.00000   41   36          -  260.00000      -   9.1  375s
+   249   583  260.00000   54   11          -  260.00000      -   8.8  380s
+   267   586  260.00000   35   45          -  260.00000      -   8.7  385s
+   284   586  260.00000   47   29          -  260.00000      -   8.5  390s
+   303   588  260.00000   55   14          -  260.00000      -   8.4  395s
+   322   593  260.00000   62   10          -  260.00000      -   8.2  400s
+   435   599  260.00000   57   16          -  260.00000      -   7.7  429s
+   629   607  260.00000   59   19          -  260.00000      -   7.6  480s
+   631   974  260.00000   64    -          -  260.00000      -   7.6  535s
+   646   975  260.00000   69    -          -  260.00000      -   7.6  540s
+   664   982  260.00000   76   12          -  260.00000      -   7.5  545s
+   681   984  260.00000   78   25          -  260.00000      -   7.5  550s
+   701   984  260.00000   86   10          -  260.00000      -   7.6  555s
+   719   988  260.00000   89   12          -  260.00000      -   7.5  560s
+   739   989  260.00000   95   12          -  260.00000      -   7.5  565s
+   876  1003  260.00000   92   14          -  260.00000      -   7.2  601s
+   888  1003  260.00000   93   12          -  260.00000      -   7.2  605s
+  1134  1047  260.00000   73   19          -  260.00000      -   6.8  670s
+
+Cutting planes:
+  User: 1
+  MIR: 18
+  Lazy constraints: 16576
+
+Explored 1144 nodes (9468 simplex iterations) in 673.05 seconds (118.98 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 0
+
+Time limit reached
+Best objective -, best bound 2.600000000000e+02, gap -
+
+User-callback calls 5798, time in user-callback 221.02 sec

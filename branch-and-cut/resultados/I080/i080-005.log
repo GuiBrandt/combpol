@@ -1,0 +1,55 @@
+
+Gurobi 10.0.3 (linux64) logging started Fri Dec 15 17:32:48 2023
+
+Set parameter LogFile to value "resultados/I080/i080-005.log"
+Set parameter Cutoff to value 3542
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 6 rows, 120 columns and 21 nonzeros
+Model fingerprint: 0x146362a6
+Variable types: 0 continuous, 120 integer (120 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [8e+01, 2e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 1 rows and 1 columns
+Presolve time: 0.00s
+Presolved: 5 rows, 119 columns, 20 nonzeros
+Variable types: 0 continuous, 119 integer (119 binary)
+
+Root relaxation: objective 1.177000e+03, 5 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1177.00000    0    -          - 1177.00000      -     -    0s
+     0     0 1285.00000    0    -          - 1285.00000      -     -    0s
+     0     0 1301.00000    0    -          - 1301.00000      -     -    0s
+     0     0 1403.00000    0    -          - 1403.00000      -     -    0s
+     0     0 1411.50000    0    6          - 1411.50000      -     -    0s
+     0     0 1421.00000    0    -          - 1421.00000      -     -    0s
+     0     0 1495.62500    0   11          - 1495.62500      -     -    0s
+     0     0 1544.00000    0    3          - 1544.00000      -     -    0s
+     0     0 1546.25000    0   12          - 1546.25000      -     -    0s
+     0     2 1554.00000    0    3          - 1554.00000      -     -    0s
+*  117   100              12    1801.0000000 1600.00000  11.2%  15.4    0s
+*  369    75              15    1790.0000000 1730.50588  3.32%  12.5    0s
+
+Cutting planes:
+  User: 126
+  MIR: 3
+  Lazy constraints: 129
+
+Explored 479 nodes (5157 simplex iterations) in 1.05 seconds (0.07 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 1790 1801 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.790000000000e+03, best bound 1.790000000000e+03, gap 0.0000%
+
+User-callback calls 1205, time in user-callback 0.93 sec

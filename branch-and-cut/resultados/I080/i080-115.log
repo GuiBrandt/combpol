@@ -1,0 +1,53 @@
+
+Gurobi 10.0.3 (linux64) logging started Fri Dec 15 18:20:26 2023
+
+Set parameter LogFile to value "resultados/I080/i080-115.log"
+Set parameter Cutoff to value 4169
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 8 rows, 350 columns and 61 nonzeros
+Model fingerprint: 0xd1748a5e
+Variable types: 0 continuous, 350 integer (350 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [9e+01, 3e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve time: 0.00s
+Presolved: 8 rows, 350 columns, 61 nonzeros
+Variable types: 0 continuous, 350 integer (350 binary)
+
+Root relaxation: objective 1.378000e+03, 8 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1378.00000    0    -          - 1378.00000      -     -    0s
+     0     0 1474.00000    0    8          - 1474.00000      -     -    0s
+     0     0 1574.00000    0    -          - 1574.00000      -     -    0s
+     0     0 1580.00000    0    -          - 1580.00000      -     -    0s
+     0     0 1590.50000    0    4          - 1590.50000      -     -    0s
+     0     0 1595.00000    0    6          - 1595.00000      -     -    0s
+     0     2 1663.55556    0   22          - 1663.55556      -     -    0s
+*  370   259              20    1880.0000000 1790.82143  4.74%  13.5    1s
+* 1464   313              16    1870.0000000 1821.00000  2.62%  13.1    3s
+  2039   241     cutoff   18      1870.00000 1838.84211  1.67%  13.4    5s
+* 2434     0               8    1868.0000000 1855.68421  0.66%  13.4    5s
+
+Cutting planes:
+  User: 21
+  MIR: 2
+  Lazy constraints: 249
+
+Explored 2500 nodes (33258 simplex iterations) in 5.64 seconds (0.82 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 3: 1868 1870 1880 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.868000000000e+03, best bound 1.868000000000e+03, gap 0.0000%
+
+User-callback calls 5471, time in user-callback 4.54 sec

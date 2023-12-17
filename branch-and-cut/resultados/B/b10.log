@@ -1,0 +1,50 @@
+
+Gurobi 10.0.3 (linux64) logging started Fri Dec 15 17:11:57 2023
+
+Set parameter LogFile to value "resultados/B/b10.log"
+Set parameter Cutoff to value 95
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (linux64)
+
+CPU model: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 13 rows, 150 columns and 46 nonzeros
+Model fingerprint: 0x72d4a285
+Variable types: 0 continuous, 150 integer (150 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 3 rows and 3 columns
+Presolve time: 0.00s
+Presolved: 10 rows, 147 columns, 43 nonzeros
+Variable types: 0 continuous, 147 integer (147 binary)
+
+Root relaxation: objective 4.100000e+01, 9 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   41.00000    0    -          -   41.00000      -     -    0s
+     0     0   56.00000    0    3          -   56.00000      -     -    0s
+     0     0   61.50000    0    5          -   61.50000      -     -    0s
+     0     0   64.50000    0    5          -   64.50000      -     -    0s
+     0     0   67.50000    0    5          -   67.50000      -     -    0s
+     0     2   69.00000    0    8          -   69.00000      -     -    0s
+* 1001   263              18      86.0000000   82.00000  4.65%   9.5    3s
+
+Cutting planes:
+  User: 60
+  MIR: 2
+  Lazy constraints: 278
+
+Explored 1384 nodes (12328 simplex iterations) in 4.25 seconds (0.21 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 86 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.600000000000e+01, best bound 8.600000000000e+01, gap 0.0000%
+
+User-callback calls 3069, time in user-callback 3.83 sec

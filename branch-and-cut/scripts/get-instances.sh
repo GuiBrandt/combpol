@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for INSTANCE in B C D E MC X SP PUC I080 LIN
+for INSTANCE in B C X PUC SP I080
 do
     ARCHIVE="$INSTANCE.tgz"
     if [ ! -f $ARCHIVE ]

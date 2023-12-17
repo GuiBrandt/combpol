@@ -7,18 +7,56 @@ from itertools import combinations, chain, islice
 from collections.abc import Iterable, Sequence
 from typing import Optional
 
+from .basic import SteinerTree, cost, is_minimal_valid_solution
+
 
 def _gomory_hu_tree_min_cut(T, u, v):
     P = nx.bidirectional_shortest_path(T, u, v)
     return min((T[i][j]['weight'], (i, j)) for i, j in zip(P, P[1:]))
 
 
-def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
+def heuristic(G: nx.Graph, Z: set[int]) -> SteinerTree:
+    """Encontra uma solução heurística para o problema de Steiner no grafo G
+    com os terminais Z.
+    
+    Usa o atributo `weight` da arestas de G como peso.
+    """
+    T = nx.minimum_spanning_tree(G)
+    # Podemos remover todas as folhas que não são terminais. Fazendo isso até
+    # que não sobre nenhuma, temos uma árvore de Steiner minimal obtida a
+    # partir de uma árvore geradora mínima, e portanto que tende a ter custo
+    # baixo.
+    nonterminal_leaves = [v for v in T.nodes if T.degree[v] == 1 and v not in Z]
+    while len(nonterminal_leaves) > 0:
+        u = nonterminal_leaves.pop()
+        v, = T.neighbors(u)
+        T.remove_edge(u, v)
+        if T.degree[v] == 1 and v not in Z:
+            nonterminal_leaves.append(v)
+    solution = { (u, v) for (u, v) in T.edges }
+    assert(is_minimal_valid_solution(G, Z, solution))
+    return solution
+
+
+def solve(
+    G: nx.Graph,
+    Z: set[int],
+    log_file: Optional[str] = None
+) -> SteinerTree:
     """Encontra uma solução ótima para o problema de Steiner no grafo G com os
     terminais Z.
 
     Usa o atributo `weight` da arestas de G como peso.
     """
+    
+    # Casos de borda
+    if len(Z) <= 1:
+        return {}
+    if len(Z) == 2:
+        u, v = Z
+        P = nx.dijkstra_path(G, u, v)
+        return { (s, t) for s, t in zip(P, P[1:]) }
+    
     def cut_edges(W: set[int]) -> Sequence[(int, int)]:
         """Gera as arestas no corte definido por um conjunto de vértices W"""
         return ((u, v) for u in W for v in G.neighbors(u) if v not in W)
@@ -26,7 +64,7 @@ def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
     def steiner_cut_constraint(W: set[int]) -> gp.Constr:
         """Devolve a restrição de corte de Steiner para um conjunto dado.
 
-        Assume-se implicitamente que o conjunto define um corte de Steiner
+        Assume-se implicitamente que o conjunto `W` define um corte de Steiner
         válido (i.e. existe pelo menos um terminal dentro e um fora do
         conjunto)."""
         return gp.quicksum(x[u, v] for u, v in cut_edges(W)) >= 1
@@ -37,9 +75,27 @@ def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
         H = nx.Graph()
         H.add_weighted_edges_from((u, v, solution[u, v]) for u, v in G.edges)
         return nx.gomory_hu_tree(H, 'weight')
+        
+    def integer_violated_constraints(solution) -> Sequence[gp.Constr]:
+        """Gera restrições violadas para uma solução inteira dada, caso
+        existam."""
+        H = nx.Graph()
+        H.add_edges_from((u, v) for u, v in G.edges if solution[u, v] > 0.5)
+        for W in nx.connected_components(H):
+            # Adiciona o corte somente quando existe pelo menos um terminal
+            # dentro e um fora da componente.
+            if Z & W and Z - W:
+                yield steiner_cut_constraint(W)
 
-    def violated_constraints(solution) -> Sequence[gp.Constr]:
+    violated_cut_pool = []
+
+    def fractional_violated_constraints(solution) -> Sequence[gp.Constr]:
         """Gera restrições violadas para uma solução dada, caso existam."""
+        # Evita chamar a árvore de Gomory-Hu repetidamente.
+        if len(violated_cut_pool) > 0:
+            yield violated_cut_pool.pop()
+            return
+            
         T = build_gomory_hu_tree(solution)
         for u, v in combinations(Z, 2):
             min_cut, (r, s) = _gomory_hu_tree_min_cut(T, u, v)
@@ -53,9 +109,11 @@ def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
                 weight = T[r][s]['weight']
                 T.remove_edge(r, s)
                 W, _ = nx.connected_components(T)
-                yield steiner_cut_constraint(W)
+                violated_cut_pool.append(steiner_cut_constraint(W))
                 # Devolvemos a aresta removida para continuar o processo.
                 T.add_edge(r, s, weight=weight)
+        if len(violated_cut_pool) > 0:
+            yield violated_cut_pool.pop()
 
     def partition_cross_edges(P: Iterable[set[int]]) -> set[(int, int)]:
         """Gera as arestas entre partes em uma partição de Steiner.
@@ -66,7 +124,7 @@ def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
             for V in P:
                 yield from cut_edges(V)
         # Elimina arestas duplicadas.
-        return set(min((u, v), (v, u)) for u, v in _directed())
+        return {min((u, v), (v, u)) for u, v in _directed()}
 
     def steiner_partition_constraint(P: list[set[int]]) -> gp.Constr:
         """Devolve a restrição de partição de Steiner para uma partição dada.
@@ -128,35 +186,46 @@ def solve(G: nx.Graph, Z: set[int]) -> (set[(int, int)], int):
 
     # Adicionamos algumas restrições de Steiner simples para inicializar o
     # problema.
-    # Em particular, se existem pelo menos dois terminais na instância, cada
-    # terminal, sozinho, define um corte de Steiner.
-    if len(Z) > 1:
-        model.addConstrs(steiner_cut_constraint({v}) for v in Z)
+    # Em particular, cada terminal, sozinho, define um corte de Steiner.
+    model.addConstrs(steiner_cut_constraint({v}) for v in Z)
 
     def callback(model, where):
         if where == GRB.Callback.MIPSOL:
             solution = model.cbGetSolution(x)
-            for constr in islice(violated_constraints(solution), 16):
+            for constr in integer_violated_constraints(solution):
                 model.cbLazy(constr)
         elif where == GRB.Callback.MIPNODE:
-            status = model.cbGet(GRB.Callback.MIPNODE_STATUS)
-            if status == GRB.OPTIMAL:
+            if model.cbGet(GRB.Callback.MIPNODE_STATUS) == GRB.OPTIMAL:
                 solution = model.cbGetNodeRel(x)
+                for constr in fractional_violated_constraints(solution):
+                    model.cbLazy(constr)
                 constr = greedy_violated_steiner_partition_constraint(solution)
                 if constr != None:
                     model.cbCut(constr)
 
     model.Params.LazyConstraints = 1
     model.Params.TimeLimit = 600
+    
+    if log_file:
+        model.Params.LogFile = log_file
+    
+    heuristic_solution = heuristic(G, Z)    
+    model.Params.CutOff = cost(G, heuristic_solution)
     model.optimize(callback)
-
+    
+    # Se o limite inferior do modelo atingiu o cutoff, a solução heurística era
+    # ótima. Se não, mas nenhuma solução foi viável foi encontrada, retorna a
+    # heurística como melhor solução.
+    if model.status == GRB.CUTOFF or model.SolCount == 0:
+        return heuristic_solution
+    
     optimal = model.getAttr('X', x)
 
-    # Selecionamos para a solução arestas com valor ótimo acima de 0.5, para
+    # Seleciona para a solução arestas com valor ótimo acima de 0.5, para
     # evitar problemas de arredondamento (e.g. valores ótimos como 0.99999...).
     solution = {(u, v) for (u, v) in G.edges if optimal[u, v] > 0.5}
-    cost = sum(w for (u, v, w) in G.edges.data("weight") if (u, v) in solution)
-    return solution, cost
+    assert(is_minimal_valid_solution(G, Z, solution))
+    return solution
 
 
 __all__ = ['solve']

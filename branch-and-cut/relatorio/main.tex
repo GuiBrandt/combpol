@@ -6,6 +6,204 @@
 
 \author{Guilherme Guidotti Brandt (235970)}
 
+\date{}
+
 \begin{document}
 \maketitle
+
+\section{Implementação}
+
+Organizei o código do programa da seguinte forma:
+\begin{itemize}
+    \item {\tt main.py} -- Arquivo de entrada
+    \item {\tt steiner/} -- Código relacionado ao problema
+          \begin{itemize}
+              \item {\tt basic.py} -- Funções auxiliares de validação e custo de solução.
+              \item {\tt solver.py} -- Implementação da heurística e modelo.
+              \item {\tt steinlib.py} -- Leitura de arquivos no formato da SteinLib.
+          \end{itemize}
+\end{itemize}
+
+\subsection{Inicialização do modelo}
+
+Inicializei o modelo com restrições de corte de Steiner para os conjuntos unitários contendo os terminais:
+
+$$\sum_{e \in \delta(\{v\})} x_e \geq 1 \qquad \forall v \in Z$$
+
+São conjuntos fáceis de gerar e que sempre definem corte de Steiner.
+
+Para definir um cut-off inicial razoável, utilizei uma heurística simples,
+gerando uma árvore geradora mínima do grafo e removendo todas folhas que não
+são terminais da árvore até que todas as folhas sejam terminais. Isso dá uma
+árvore de Steiner minimal com custo  razoavelmente baixo, e é barato (e a
+implementação é bastante simples, especiamente dado que a biblioteca NetworkX, utilizada
+para a árvore de Gomory-Hu, também tem uma função de árvore geradora mínima).
+
+Uma melhoria possível seria construir a árvore geradora mínima sobre a união
+das árvores de caminhos mínimos entre os terminais, ao invés do grafo todo;
+não implementei essa variação da heurística para poder priorizar outras
+partes do problema, visto que a heurística simples serviu razoavelmente bem.
+
+\subsection{Lazy Constraints}
+
+Implementei a separação das restrições de corte com a árvore de Gomory-Hu, para
+as soluções fracionárias (quando {\tt where} é {\tt MIPNODE} e o estado do
+modelo é {\tt OPTIMAL} no callback do Gurobi).
+
+A princípio, usei a mesma rotina para a separação das restrições violadas nas
+soluções inteiras ({\tt where} = {\tt MIPSOL}), mas o programa ficou muito
+lento e tinha dificuldade em resolver mesmo instâncias pequenas. Substituí a
+rotina de separação para as soluções inteiras por uma que simplesmente olha
+para as componentes conexas do grafo correspondente e gera restrições de corte
+de Steiner para cada componente que contém algum terminal (mas que não contenha
+todos). Isso melhorou o desempenho consideravelmente.
+
+Para economizar chamadas à função de Gomory-Hu, adicionei também um pool de
+restrições para a função de separação. Quando calcula a árvore de Gomory-Hu, a
+função adiciona todas as restrições que puder no pool; nas chamadas
+subsequentes, a função simplesmente retira uma restrição do pool e devolve, uma
+por uma, até que o pool fique vazio (e nesse caso a árvore de Gomory-Hu é
+computada novamente, repetindo o mesmo processo). Isso também diminuiu o
+gargalo do callback.
+
+\subsection{User cuts}
+
+Implementei a heurística gulosa para restrição de partição de Steiner violada
+descrita no livro, utilizando o callback do Gurobi ({\tt where} = {\tt MIPNODE} e estado {\tt OPTIMAL}). Aproveitei a estrutura de Union-Find da biblioteca NetworkX
+para representar a partição (mantendo $V_0$ em separado) durante a heurística.
+
+\section{Resultados computacionais}
+
+Executei os testes em uma máquina com um processador Intel i7-8650U de 1.9Ghz e 8 núcleos, com 16GiB de RAM, com o sistema operacional Ubuntu 22.04.
+Utilizei a versão 3.10.12 do Python, a versão 10.0.3 do Gurobi, e a versão 3.2.1 da biblioteca NetworkX.
+
+Limitei o tempo de execução definindo o parâmetero {\tt TimeLimit} para 600 segundos.
+
+A tabela \ref{tab:results-b} apresenta os resultados do programa para o conjunto de testes B, e a tabela \ref{tab:results-c} apresenta os resultados para o conjunto C.
+Onde o programa encontra uma solução ótima, o valor da melhor solução é apresentado em destaque.
+
+As tabelas \ref{tab:results-b-detailed} e \ref{tab:results-c-detailed} aparesentam mais detalhes sobre a execução do algoritmo, indicando os valores obtidos para as heurísticas, o tempo total gasto pelo Gurobi na execução do callback, e o melhor limitante inferior obtido, quando o programa não encontrou a solução ótima ou não conseguiu provar a otimalidade dentro do tempo limite.
+
+Todos os valores indicados nas tabelas foram extraídos a partir dos logs gerados pelo Gurobi.
+
+\begin{table}
+    \centering
+    \begin{tabular}{c|c|c|c|c|c}
+        Instância & $|V|$ & $|E|$ & $|T|$ & Melhor solução & Tempo   \\\hline
+        {\tt b01} & 50    & 63    & 9     & {\bf 82}       & 0,12s   \\
+        {\tt b02} & 50    & 63    & 13    & {\bf 83}       & 0,15s   \\
+        {\tt b03} & 50    & 63    & 25    & {\bf 138}      & 0,05s   \\
+        {\tt b04} & 50    & 100   & 9     & {\bf 59}       & 0,32s   \\
+        {\tt b05} & 50    & 100   & 13    & {\bf 61}       & 0,64s   \\
+        {\tt b06} & 50    & 100   & 25    & {\bf 122}      & 5,67s   \\
+        {\tt b07} & 75    & 94    & 13    & {\bf 111}      & 1,69s   \\
+        {\tt b08} & 75    & 94    & 19    & {\bf 104}      & 1,75s   \\
+        {\tt b09} & 75    & 94    & 38    & {\bf 220}      & 0,77s   \\
+        {\tt b10} & 75    & 150   & 13    & {\bf 86}       & 4,25s   \\
+        {\tt b11} & 75    & 150   & 19    & {\bf 88}       & 9,36s   \\
+        {\tt b12} & 75    & 150   & 38    & {\bf 174}      & 194,86s \\
+        {\tt b13} & 100   & 125   & 17    & {\bf 165}      & 28,88s  \\
+        {\tt b14} & 100   & 125   & 25    & {\bf 235}      & 98,22s  \\
+        {\tt b15} & 100   & 125   & 50    & {\bf 318}      & 200,97s \\
+        {\tt b16} & 100   & 200   & 17    & {\bf 127}      & 30,25s  \\
+        {\tt b17} & 100   & 200   & 25    & {\bf 131}      & 70,48s  \\
+        {\tt b18} & 100   & 200   & 50    & 222            & 604,31s \\
+    \end{tabular}
+    \caption{Resultados computacionais do grupo B de instâncias.}
+    \label{tab:results-b}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabular}{c|c|c|c|c|c}
+        Instância & $|V|$ & $|E|$ & $|T|$ & Valor     & Tempo   \\\hline
+        {\tt c01} & 500   & 625   & 5     & {\bf 85}  & 161.74s \\
+        {\tt c02} & 500   & 625   & 10    & {\bf 144} & 604.85s \\
+        {\tt c03} & 500   & 625   & 83    & --        & 619.78s \\
+        {\tt c04} & 500   & 625   & 125   & --        & 617.63s \\
+        {\tt c05} & 500   & 625   & 250   & --        & 620.74s \\
+        {\tt c06} & 500   & 1000  & 5     & {\bf 55}  & 148.85s \\
+        {\tt c07} & 500   & 1000  & 10    & {\bf 102} & 604.58s \\
+        {\tt c08} & 500   & 1000  & 83    & --        & 601.40s \\
+        {\tt c09} & 500   & 1000  & 125   & --        & 609.09s \\
+        {\tt c10} & 500   & 1000  & 250   & --        & 623.26s \\
+        {\tt c11} & 500   & 2500  & 5     & {\bf 32}  & 168.44s \\
+        {\tt c12} & 500   & 2500  & 10    & {\bf 46}  & 603.92s \\
+        {\tt c13} & 500   & 2500  & 83    & --        & 632.07s \\
+        {\tt c14} & 500   & 2500  & 125   & --        & 612.91s \\
+        {\tt c15} & 500   & 2500  & 250   & --        & 607.83s \\
+        {\tt c16} & 500   & 12500 & 5     & {\bf 11}  & 404.00s \\
+        {\tt c17} & 500   & 12500 & 10    & 20        & 603.70s \\
+        {\tt c18} & 500   & 12500 & 83    & --        & 653.64s \\
+        {\tt c19} & 500   & 12500 & 125   & --        & 600.08s \\
+        {\tt c20} & 500   & 12500 & 250   & --        & 673.05s \\
+    \end{tabular}
+    \caption{Resultados computacionais do grupo C de instâncias.}
+    \label{tab:results-c}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabular}{c|c|c|c|c|c}
+        Instância & Melhor & Heurística & Limitante & Tempo   & Callback \\\hline
+        {\tt b01} & 82     & 89         & --        & 0,12s   & 0,09s    \\
+        {\tt b02} & 83     & 96         & --        & 0,15s   & 0,12s    \\
+        {\tt b03} & 138    & 144        & --        & 0,05s   & 0,03s    \\
+        {\tt b04} & 59     & 68         & --        & 0,32s   & 0,26s    \\
+        {\tt b05} & 61     & 68         & --        & 0,64s   & 0,54s    \\
+        {\tt b06} & 122    & 130        & --        & 5,67s   & 3,92s    \\
+        {\tt b07} & 111    & 127        & --        & 1,69s   & 1,54s    \\
+        {\tt b08} & 104    & 111        & --        & 1,75s   & 1,57s    \\
+        {\tt b09} & 220    & 220        & --        & 0,77s   & 0,61s    \\
+        {\tt b10} & 86     & 95         & --        & 4,25s   & 3,83s    \\
+        {\tt b11} & 88     & 124        & --        & 9,36s   & 6,85s    \\
+        {\tt b12} & 174    & 189        & --        & 194,86s & 156,95s  \\
+        {\tt b13} & 165    & 189        & --        & 28,88s  & 24,38s   \\
+        {\tt b14} & 235    & 255        & --        & 98,22s  & 83,39s   \\
+        {\tt b15} & 318    & 333        & --        & 200,97s & 165,68s  \\
+        {\tt b16} & 127    & 166        & --        & 30,25s  & 24,78s   \\
+        {\tt b17} & 131    & 151        & --        & 70,48s  & 59,73s   \\
+        {\tt b18} & 222    & 230        & 216       & 604,31s & 513.67s  \\
+    \end{tabular}
+    \caption{Resultados computacionais do grupo B de instâncias.}
+    \label{tab:results-b-detailed}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabular}{c|c|c|c|c|c}
+        Instância & Valor & Heurística & Limitante & Tempo   & Callback \\\hline
+        {\tt c01} & 85    & 118        & --        & 161.74s & 157.30s  \\
+        {\tt c02} & 144   & 194        & --        & 604.85s & 530.96s  \\
+        {\tt c03} & --    & 847        & 680       & 619.78s & 597.25s  \\
+        {\tt c04} & --    & 1155       & 995       & 617.63s & 598.18s  \\
+        {\tt c05} & --    & 1637       & 1544      & 620.74s & 595.11s  \\
+        {\tt c06} & 55    & 116        & --        & 148.85s & 143.74s  \\
+        {\tt c07} & 102   & 186        & 100       & 604.58s & 556.63s  \\
+        {\tt c08} & --    & 648        & 463       & 601.40s & 561.39s  \\
+        {\tt c09} & --    & 835        & 635       & 609.09s & 556.96s  \\
+        {\tt c10} & --    & 1163       & 1060      & 623.26s & 516.96s  \\
+        {\tt c11} & 32    & 47         & --        & 168.44s & 161.82s  \\
+        {\tt c12} & 46    & 69         & 44        & 603.92s & 539.79s  \\
+        {\tt c13} & --    & 321        & 230       & 632.07s & 566.54s  \\
+        {\tt c14} & --    & 402        & 300       & 612.91s & 532.20s  \\
+        {\tt c15} & --    & 616        & 535       & 607.83s & 551.09s  \\
+        {\tt c16} & 11    & 38         & --        & 404.00s & 393.35s  \\
+        {\tt c17} & 20    & 39         & 17        & 603.70s & 571.11s  \\
+        {\tt c18} & --    & 181        & 108       & 653.64s & 496.52s  \\
+        {\tt c19} & --    & 232        & 145       & 600.08s & 218.82s  \\
+        {\tt c20} & --    & 341        & 260       & 673.05s & 221.02s  \\
+    \end{tabular}
+    \caption{Resultados computacionais do grupo C de instâncias.}
+    \label{tab:results-c-detailed}
+\end{table}
+
+O algoritmo se sai bem no conjunto de testes B, resolvendo a maior parte das
+instâncias em menos de três minutos. A única exceção é a instância {\tt b18},
+com 100 vértices e 200 arestas, na para a qual o programa atingiu o tempo limite.
+
+No conjunto de testes C, o programa encontra soluções apenas para instâncias onde a árvore tem tamanho 5 ou 10, e
+consegue provar a otimalidade para quatro (de sete) delas. Das que o programa encontra uma solução mas não consegue
+provar sua otimalidade, apenas uma (a maior delas, {\tt c17}) não atingiu de fato o valor ótimo.
+
 \end{document}
